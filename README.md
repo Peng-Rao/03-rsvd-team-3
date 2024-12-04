@@ -17,6 +17,11 @@ For Windows, see this guide: https://learn.microsoft.com/en-us/vcpkg/get_started
 
 **Fork** and **Clone** this project to your own repo.
 
+Install libraries:
+```
+vcpkg install
+```
+
 And then write building script:
 CMakeUserPresets.json
 ```json
