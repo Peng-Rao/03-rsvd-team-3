@@ -5,6 +5,7 @@ brew install cmake
 brew install vcpkg
 ```
 Add to `PATH`:
+!**Change `{{your username}}` to your own username**!
 ```bash
 vim ~/.zshrc
 
@@ -17,7 +18,9 @@ For Windows, see this guide: https://learn.microsoft.com/en-us/vcpkg/get_started
 
 **Fork** and **Clone** this project to your own repo.
 
-And then write building script:
+And then write building script, add to project root directory:
+```bash
+!**Change `{{your username}}` to your own username**!
 CMakeUserPresets.json
 ```json
 {
