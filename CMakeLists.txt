@@ -21,6 +21,14 @@ add_executable(BenchmarkTests benchmarks/benchmark_main.cpp
 )
 target_link_libraries(BenchmarkTests PRIVATE Catch2::Catch2WithMain)
 
+
+find_package(MPI REQUIRED)
+include_directories(SYSTEM ${MPI_INCLUDE_DIRS})
+target_link_libraries(main PRIVATE MPI::MPI_CXX)
+target_link_libraries(UnitTests PRIVATE MPI::MPI_CXX)
+target_link_libraries(BenchmarkTests PRIVATE MPI::MPI_CXX)
+
+
 include(CTest)
 include(Catch)
 catch_discover_tests(UnitTests)

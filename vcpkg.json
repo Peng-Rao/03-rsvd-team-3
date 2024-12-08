@@ -1,6 +1,12 @@
 {
-  "dependencies" : [ "eigen3", {
-    "name" : "catch2",
-    "version>=" : "3.7.1"
-  } ]
+  "dependencies": [
+    "eigen3",
+    {
+      "name": "catch2",
+      "version>=": "3.7.1"
+    },
+    {
+      "name": "mpi"
+  }
+  ]
 }

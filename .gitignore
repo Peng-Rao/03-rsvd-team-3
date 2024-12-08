@@ -65,3 +65,4 @@ fabric.properties
 # vscode
 .vscode/
 CMakeUserPresets.json
+src/main
