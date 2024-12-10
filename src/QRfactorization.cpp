@@ -12,13 +12,18 @@ void givensRotation(double a, double b, double& c, double& s) {
 //size_t is an unsigned integer type that represents the size of an object or the index of an array
 
 // Function to apply the Givens rotation to a matrix A
-void applyGivensRotation(std::vector<std::vector<double>>& A, size_t i, size_t j, double c, double s) {
+void applyGivensRotation(std::vector<std::vector<double>>& A, size_t i, size_t j, double c, double s, bool Q) {
     //for cycle across columns of A, rotate two dimensions each time and fix all other dimensions
     for (size_t k = 0; k < A[0].size(); ++k) {
-        double temp1 = c * A[i][k] - s * A[j][k];
-        double temp2 = s * A[i][k] + c * A[j][k];
-        A[i][k] = temp1;
-        A[j][k] = temp2;
+        double z=A[i][k];
+        double h=A[j][k];
+        if (Q) {
+            A[i][k] = c*z+s*h;
+            A[j][k] = -s*z+c*h;  
+        } else {
+            A[i][k] = c*z-s*h;
+            A[j][k] = s*z+c*h;
+        }
     }
 }
 
@@ -45,8 +50,8 @@ void qrFactorizationGivenRotation(std::vector<std::vector<double>>& A, std::vect
                                                     //that needs to be reduced to zero
             
             // Apply the Givens rotation to both R and Q
-            applyGivensRotation(R, i - 1, i, c, s);
-            applyGivensRotation(Q, i - 1, i, c, s);
+            applyGivensRotation(R, i - 1, i, c, s, false);
+            applyGivensRotation(Q, i - 1, i, c, s, true);
         }
     }
 }
