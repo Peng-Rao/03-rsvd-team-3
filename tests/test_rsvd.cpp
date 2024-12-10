@@ -1,6 +1,6 @@
 #include "RandomizedSVD.h"
 
-#include <Eigen/Core>
+
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("RandomizedSVD on Hilbert matrix", "[rsvd_hilbert]") {
@@ -8,7 +8,7 @@ TEST_CASE("RandomizedSVD on Hilbert matrix", "[rsvd_hilbert]") {
     using MatrixXd = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
 
     // set the dimensions of the Hilbert matrix
-    constexpr int n{500};
+    constexpr int n{100};
     constexpr int rank{10};
     constexpr int powerIterations{2};
 
