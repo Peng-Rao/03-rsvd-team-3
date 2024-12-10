@@ -1,32 +1,31 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.20)
 project(03_rsvd_team_3)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
 
 find_package(Eigen3 CONFIG REQUIRED)
-add_executable(main src/main.cpp
-        src/RandomizedSVD.h
-)
-target_link_libraries(main PRIVATE Eigen3::Eigen)
-
-
-find_package(Catch2 REQUIRED)
-add_executable(UnitTests
-        tests/test_rsvd.cpp)
-target_link_libraries(UnitTests PRIVATE Catch2::Catch2WithMain)
-
-add_executable(BenchmarkTests benchmarks/benchmark_main.cpp
-)
-target_link_libraries(BenchmarkTests PRIVATE Catch2::Catch2WithMain)
-
-
+find_package(Catch2 CONFIG REQUIRED)
 find_package(MPI REQUIRED)
+find_package(OpenMP REQUIRED COMPONENTS CXX)
+
+include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(SYSTEM ${MPI_INCLUDE_DIRS})
-target_link_libraries(main PRIVATE MPI::MPI_CXX)
+
+# config for unit tests
+add_executable(UnitTests tests/test_rsvd.cpp)
+target_link_libraries(UnitTests PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(UnitTests PRIVATE MPI::MPI_CXX)
-target_link_libraries(BenchmarkTests PRIVATE MPI::MPI_CXX)
+
+# config for matmul benchmarks
+add_executable(BenchMatmul benchmarks/bench_matmul.cpp)
+target_link_libraries(BenchMatmul PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchMatmul PUBLIC OpenMP::OpenMP_CXX)
+
+# config for rsvd using OpenMP benchmarks
+add_executable(BenchRSVD benchmarks/bench_rsvd.cpp)
+target_link_libraries(BenchRSVD PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchRSVD PUBLIC OpenMP::OpenMP_CXX)
 
 
 include(CTest)
