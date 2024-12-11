@@ -21,11 +21,13 @@ target_link_libraries(UnitTests PRIVATE MPI::MPI_CXX)
 add_executable(BenchMatmul benchmarks/bench_matmul.cpp)
 target_link_libraries(BenchMatmul PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(BenchMatmul PUBLIC OpenMP::OpenMP_CXX)
+target_compile_options(BenchMatmul PRIVATE -O3)
 
 # config for rsvd using OpenMP benchmarks
 add_executable(BenchRSVD benchmarks/bench_rsvd.cpp)
 target_link_libraries(BenchRSVD PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(BenchRSVD PUBLIC OpenMP::OpenMP_CXX)
+target_compile_options(BenchRSVD PRIVATE -O3)
 
 
 include(CTest)

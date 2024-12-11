@@ -81,7 +81,7 @@ namespace Eigen {
             DenseMatrix B = Q.transpose() * matrix;
 
             // Step 6: Perform SVD on the small matrix B
-            JacobiSVD<DenseMatrix> svd(B, Options);
+            BDCSVD<DenseMatrix> svd(B, Options);
             m_singularValues = svd.singularValues();
             m_matrixU = Q * svd.matrixU();
             m_matrixV = svd.matrixV();
