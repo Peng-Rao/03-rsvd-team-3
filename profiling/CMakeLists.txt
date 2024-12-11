@@ -1,0 +1,5 @@
+add_executable(rsvd_profiling rsvd.cpp)
+target_link_libraries(rsvd_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(rsvd_profiling PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(rsvd_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(rsvd_profiling PRIVATE -O3 -march=native)
