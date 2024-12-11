@@ -8,8 +8,20 @@ const int cols = 1000;
 Eigen::MatrixXd A = Eigen::MatrixXd::Random(rows, cols);
 Eigen::MatrixXd B = Eigen::MatrixXd::Random(cols, rows);
 
-TEST_CASE("matmul", "[benchmark]") {
-    BENCHMARK("matmul") {
+void setEigenThreads(int numThreads) {
+    Eigen::setNbThreads(numThreads);
+}
+
+TEST_CASE("Matrix Multiplication Benchmark with and without OpenMP", "[matmul_bench]") {
+    int defaultThreads = Eigen::nbThreads();
+
+    BENCHMARK("Matrix Multiplication with OpenMP") {
+        setEigenThreads(defaultThreads);
+        Eigen::MatrixXd C = A * B;
+    };
+
+    BENCHMARK("Matrix Multiplication without OpenMP") {
+        setEigenThreads(1);
         Eigen::MatrixXd C = A * B;
     };
 }
