@@ -4,6 +4,8 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#include <random>
+
 namespace Eigen {
 
     /**
@@ -55,6 +57,27 @@ namespace Eigen {
 
     private:
         /**
+         * @brief Generate a random matrix
+         *
+         * @param rows Number of rows
+         * @param cols Number of columns
+         * @return A random matrix
+         */
+        DenseMatrix generateRandomMatrix(Index rows, Index cols) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::normal_distribution<Scalar> dist(0.0, 1.0);
+
+            DenseMatrix mat(rows, cols);
+            for (Index i = 0; i < rows; ++i) {
+                for (Index j = 0; j < cols; ++j) {
+                    mat(i, j) = dist(gen);
+                }
+            }
+            return mat;
+        }
+
+        /**
          * @brief Perform the randomized projection
          *
          * @param matrix The input matrix
@@ -63,7 +86,7 @@ namespace Eigen {
          */
         void randomProjection(const MatrixType &matrix, Index rank, Index powerIterations) {
             // Step 1: Generate a random Gaussian matrix
-            DenseMatrix randomMatrix = DenseMatrix::Random(matrix.cols(), rank);
+            DenseMatrix randomMatrix = generateRandomMatrix(matrix.cols(), rank);
 
             // Step 2: Form the sketch matrix
             DenseMatrix sketch = matrix * randomMatrix;
@@ -75,13 +98,13 @@ namespace Eigen {
 
             // Step 4: Compute the QR decomposition of the sketch
             HouseholderQR<DenseMatrix> qr(sketch);
-            DenseMatrix Q = qr.householderQ();
+            DenseMatrix Q = qr.householderQ() * DenseMatrix::Identity(sketch.rows(), rank);
 
             // Step 5: Project the original matrix onto the low-dimensional subspace
             DenseMatrix B = Q.transpose() * matrix;
 
             // Step 6: Perform SVD on the small matrix B
-            BDCSVD<DenseMatrix> svd(B, Options);
+            JacobiSVD<DenseMatrix> svd(B, Options);
             m_singularValues = svd.singularValues();
             m_matrixU = Q * svd.matrixU();
             m_matrixV = svd.matrixV();
