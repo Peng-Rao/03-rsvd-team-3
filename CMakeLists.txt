@@ -32,6 +32,12 @@ target_link_libraries(BenchRSVD PUBLIC OpenMP::OpenMP_CXX)
 target_link_libraries(BenchRSVD PRIVATE OpenBLAS::OpenBLAS)
 target_compile_options(BenchRSVD PRIVATE -O3 -march=native)
 
+# config for my rsvd benchmarks
+add_executable(BenchMyRSVD benchmarks/bench_myRSVD.cpp)
+target_link_libraries(BenchMyRSVD PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchMyRSVD PUBLIC OpenMP::OpenMP_CXX)
+target_compile_options(BenchMyRSVD PRIVATE -O3)
+
 include(CTest)
 include(Catch)
 catch_discover_tests(UnitTests)
