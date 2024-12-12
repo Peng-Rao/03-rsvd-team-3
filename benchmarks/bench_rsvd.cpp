@@ -1,9 +1,11 @@
+#define EIGEN_USE_BLAS
+
 #include "RandomizedSVD.h"
 #include <Eigen/Dense>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
 
-constexpr int n{500};
+constexpr int n{2000};
 constexpr int rank{10};
 constexpr int powerIterations{2};
 
