@@ -1,0 +1,17 @@
+add_executable(rsvd_profiling rsvd.cpp)
+target_link_libraries(rsvd_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(rsvd_profiling PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(rsvd_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(rsvd_profiling PRIVATE -O3 -march=native)
+
+add_executable(pmsvd_profiling pmsvd.cpp)
+target_link_libraries(pmsvd_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(pmsvd_profiling PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(pmsvd_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(pmsvd_profiling PRIVATE -O3 -march=native)
+
+add_executable(givensrotation_qr_profiling givensrotation_qr.cpp)
+target_link_libraries(givensrotation_qr_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(givensrotation_qr_profiling PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(givensrotation_qr_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(givensrotation_qr_profiling PRIVATE -O3 -march=native)

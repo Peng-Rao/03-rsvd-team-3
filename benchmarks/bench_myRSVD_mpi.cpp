@@ -6,17 +6,13 @@
 #include "RandomizedSVD.h"
 
 // Test different matrix sizes for better comparison
-std::vector<int> sizes = {50, 100, 200, 400};
+std::vector<int> sizes = {10000};
 constexpr int rank{10};
 constexpr int powerIterations{2};
 
 TEST_CASE("Custom RSVD MPI Implementation Benchmark", "[custom_rsvd_mpi_bench]") {
     // Initialize MPI
-    int mpi_initialized;
-    MPI_Initialized(&mpi_initialized);
-    if (!mpi_initialized) {
-        MPI_Init(NULL, NULL);
-    }
+    MPI_Init(NULL, NULL);
 
     int world_rank, world_size;
     MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
@@ -34,8 +30,7 @@ TEST_CASE("Custom RSVD MPI Implementation Benchmark", "[custom_rsvd_mpi_bench]")
         
         try {
             Eigen::RandomizedSVD<Eigen::MatrixXd> rsvd;
-            int defaultThreads = Eigen::nbThreads();
-            Eigen::setNbThreads(defaultThreads);
+            Eigen::setNbThreads(8);
             rsvd.compute_mpi(testMatrix, rank, powerIterations);
             
             // Only synchronize after MPI computation
@@ -57,9 +52,5 @@ TEST_CASE("Custom RSVD MPI Implementation Benchmark", "[custom_rsvd_mpi_bench]")
     }
 
     // Finalize MPI
-    int mpi_finalized;
-    MPI_Finalized(&mpi_finalized);
-    if (!mpi_finalized) {
-        MPI_Finalize();
-    }
+    MPI_Finalize();
 }
