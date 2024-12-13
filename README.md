@@ -17,8 +17,8 @@ brew install llvm
 To use `vcpkg`:
 ```bash
 git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
-export VCPKG_ROOT="$HOME/vcpkg"
-$VCPKG_ROOT/bootstrap-vcpkg.sh"
+export VCPKG_ROOT="$HOME/vcpkg
+$VCPKG_ROOT/bootstrap-vcpkg.sh
 ```
 After installing the above packages, you need to load them into `PATH`, for `MacOS`, edit the `.zshrc` file:
 ```bash

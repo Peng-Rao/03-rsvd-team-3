@@ -4,9 +4,7 @@
 #include "PowerMethodSVD.h"
 
 #include <Eigen/Core>
-#include <Eigen/Dense>
-#include <mpi.h>
-#include <omp.h>
+
 #include <random>
 
 namespace Eigen {
@@ -39,7 +37,6 @@ namespace Eigen {
             randomProjection(matrix, rank, powerIterations);
             return *this;
         }
-
 
         /**
          * @brief Get the singular values
@@ -108,13 +105,14 @@ namespace Eigen {
             DenseMatrix B = Q.transpose() * matrix;
 
             // Step 6: Perform SVD on the small matrix B
-            PowerMethodSVD<DenseMatrix> svd;
-            svd.compute(B, rank, 1000, Scalar(1e-6));
+            // PowerMethodSVD<DenseMatrix> svd;
+            // svd.compute(B, rank, 1000, Scalar(1e-6));
+            JacobiSVD<DenseMatrix> svd;
+            svd.compute(B, ComputeThinU | ComputeThinV);
             m_singularValues = svd.singularValues();
             m_matrixU = Q * svd.matrixU();
             m_matrixV = svd.matrixV();
         }
-
 
         // Member variables to store results
         DenseMatrix m_matrixU;
