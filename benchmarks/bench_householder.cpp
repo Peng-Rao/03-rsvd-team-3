@@ -50,7 +50,7 @@ constexpr int stepSize = 100;
 
 constexpr double sparsity = 0.1;
 std::mt19937 gen(42);
-std::uniform_real_distribution<double> dis(0.0, 1.0);
+std::uniform_real_distribution dis(0.0, 1.0);
 auto denseMatrices = generateDenseMatrices(startSize, endSize, stepSize);
 auto sparseMatrices = generateSparseMatrices(startSize, endSize, stepSize, sparsity);
 
