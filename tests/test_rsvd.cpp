@@ -1,6 +1,6 @@
 #include "RandomizedSVD.h"
 
-
+#include <Eigen/Dense>
 #include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("RandomizedSVD on Hilbert matrix", "[rsvd_hilbert]") {
