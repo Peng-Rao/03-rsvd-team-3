@@ -82,3 +82,19 @@ cmake --build build
 ```
 mpirun -np 4 ./build/main
 ```
+
+# RandomizedSVD.h code explanation
+The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 
+It is written using the Eigen namespace. 
+The RandomizedSVD template class has two parameters:
+  - The type of the input matrix
+  - The decomposition options
+It uses the default constructor.
+It has 4 public methods:
+ - compute(): contains the rSVD algorithm
+ - singularValue(): returns the vector of singular values
+ - matrixU(): returns the left singular vectors
+ - matrixV(): returns the right singular vectors
+Then there are 2 private methods:
+ - generateRandomMatrix(): generates a 2D random matrix with random Gaussian values      given the matrix dimensions.
+ - randomProjection(): this methods is the core of the rSVD decomposition. It generates a random Gaussian matrix and multiplies the input matrix by it, creating a "sketch" matrix. Then it performs the number of Power Iteraions requested on the sketc to refine it. Using the HouseholderQR function, it computer the QR decomposition of the sketch. Finally, it projects the original matrix onto the low-dimensional subspace and performs the SVD on it using the JacobiSVD function.

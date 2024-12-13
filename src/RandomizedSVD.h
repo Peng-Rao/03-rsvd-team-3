@@ -1,5 +1,5 @@
 #ifndef RANDOMIZEDSVD_H
-#define RANDOMIZEDSVD_H
+#define RANDOMIZEDSVD_H  //guards to protect against multiple inclusions of the same header file
 
 #include "PowerMethodSVD.h"
 
