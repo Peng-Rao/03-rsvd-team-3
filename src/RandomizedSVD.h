@@ -3,6 +3,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
+#include <mpi.h>
 
 namespace Eigen {
 
@@ -32,6 +33,59 @@ namespace Eigen {
          */
         RandomizedSVD &compute(const MatrixType &matrix, Index rank, Index powerIterations = 2) {
             randomProjection(matrix, rank, powerIterations);
+            return *this;
+        }
+
+        /**
+         * @brief Compute the RSVD of a matrix using MPI
+         */
+        RandomizedSVD &compute_mpi(const MatrixType &matrix, Index rank, Index powerIterations = 2) {
+            int world_size, world_rank;
+            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+            Index rows = matrix.rows();
+            Index cols = matrix.cols();
+
+            // Generate random matrix on rank 0 and broadcast
+            DenseMatrix randomMatrix(cols, rank);
+            if (world_rank == 0) {
+                randomMatrix = DenseMatrix::Random(cols, rank);
+            }
+            MPI_Bcast(randomMatrix.data(), cols * rank, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+            // Form and reduce sketch
+            DenseMatrix sketch = matrix * randomMatrix;  // (rows x cols) * (cols x rank) = (rows x rank)
+            DenseMatrix global_sketch(rows, rank);
+            MPI_Allreduce(MPI_IN_PLACE, sketch.data(), rows * rank,
+                         MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            global_sketch = sketch;
+
+            // Power iterations
+            for (Index i = 0; i < powerIterations; ++i) {
+                sketch = matrix.transpose() * global_sketch;  // (cols x rows) * (rows x rank) = (cols x rank)
+                sketch = matrix * sketch;  // (rows x cols) * (cols x rank) = (rows x rank)
+                MPI_Allreduce(MPI_IN_PLACE, sketch.data(), rows * rank,
+                             MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+                global_sketch = sketch;
+            }
+
+            // QR decomposition
+            HouseholderQR<DenseMatrix> qr(global_sketch);
+            DenseMatrix Q = qr.householderQ();  // (rows x rank)
+
+            // Project and reduce
+            DenseMatrix B = Q.transpose() * matrix;  // (rank x rows) * (rows x cols) = (rank x cols)
+            DenseMatrix global_B = B;
+            MPI_Allreduce(MPI_IN_PLACE, global_B.data(), rank * cols,
+                         MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+            // Final SVD
+            BDCSVD<DenseMatrix> svd(global_B, Options);
+            m_singularValues = svd.singularValues();
+            m_matrixU = Q * svd.matrixU();
+            m_matrixV = svd.matrixV();
+
             return *this;
         }
 

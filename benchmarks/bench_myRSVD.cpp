@@ -24,10 +24,11 @@ TEST_CASE("Custom RSVD Implementation Benchmark", "[custom_rsvd_bench]") {
 
         // Add debug prints before OpenMP benchmark
         BENCHMARK(("Custom RSVD with OpenMP (size=" + sizeStr + ")").c_str()) {
-            // myRSVD.computeWithOpenMP(testMatrix, rank, powerIterations);
+            int defaultThreads = Eigen::nbThreads();
+            std::cout<<"defaultThreads:"<< defaultThreads<<std::endl;
             Eigen::setNbThreads(4);
             myRSVD.compute(testMatrix, rank, powerIterations);
         };
-
     }
-} 
+
+}
