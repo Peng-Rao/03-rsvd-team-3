@@ -40,13 +40,6 @@ namespace Eigen {
             return *this;
         }
 
-        /**
-         * @brief Compute the RSVD of a matrix using MPI
-         */
-        RandomizedSVD &compute_mpi(const MatrixType &matrix, Index rank, Index powerIterations = 2) {
-            randomProjection_mpi(matrix, rank, powerIterations);
-            return *this;
-        }
 
         /**
          * @brief Get the singular values
@@ -122,60 +115,6 @@ namespace Eigen {
             m_matrixV = svd.matrixV();
         }
 
-        /**
-         * @brief Perform the randomized projection using MPI
-         *
-         * @param matrix The input matrix
-         * @param rank Desired rank of the approximation
-         * @param powerIterations Number of power iterations
-         */
-        void randomProjection_mpi(const MatrixType &matrix, Index rank, Index powerIterations) {
-            int world_size, world_rank;
-            MPI_Comm_size(MPI_COMM_WORLD, &world_size);
-            MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-
-            Index rows = matrix.rows();
-            Index cols = matrix.cols();
-
-            // Step 1: Generate a random Gaussian matrix on rank 0 and broadcast
-            DenseMatrix randomMatrix(cols, rank);
-            if (world_rank == 0) {
-                randomMatrix = DenseMatrix::Random(cols, rank);
-            }
-            MPI_Bcast(randomMatrix.data(), cols * rank, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-
-            // Step 2: Form the sketch matrix and reduce
-            DenseMatrix sketch = matrix * randomMatrix;
-            DenseMatrix global_sketch(rows, rank);
-            MPI_Allreduce(MPI_IN_PLACE, sketch.data(), rows * rank,
-                         MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            global_sketch = sketch;
-
-            // Step 3: Perform power iterations to refine the sketch
-            for (Index i = 0; i < powerIterations; ++i) {
-                sketch = matrix.transpose() * global_sketch;
-                sketch = matrix * sketch;
-                MPI_Allreduce(MPI_IN_PLACE, sketch.data(), rows * rank,
-                             MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-                global_sketch = sketch;
-            }
-
-            // Step 4: Compute the QR decomposition of the sketch
-            HouseholderQR<DenseMatrix> qr(global_sketch);
-            DenseMatrix Q = qr.householderQ() * DenseMatrix::Identity(rows, rank);
-
-            // Step 5: Project the original matrix onto the low-dimensional subspace and reduce
-            DenseMatrix B = Q.transpose() * matrix;
-            DenseMatrix global_B = B;
-            MPI_Allreduce(MPI_IN_PLACE, global_B.data(), rank * cols,
-                         MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-
-            // Step 6: Perform SVD on the small matrix B
-            BDCSVD<DenseMatrix> svd(global_B, Options);
-            m_singularValues = svd.singularValues();
-            m_matrixU = Q * svd.matrixU();
-            m_matrixV = svd.matrixV();
-        }
 
         // Member variables to store results
         DenseMatrix m_matrixU;
