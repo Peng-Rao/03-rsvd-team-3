@@ -1,6 +1,8 @@
 #ifndef RANDOMIZEDSVD_H
 #define RANDOMIZEDSVD_H
 
+#include "PowerMethodSVD.h"
+
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <mpi.h>
@@ -113,7 +115,8 @@ namespace Eigen {
             DenseMatrix B = Q.transpose() * matrix;
 
             // Step 6: Perform SVD on the small matrix B
-            JacobiSVD<DenseMatrix> svd(B, Options);
+            PowerMethodSVD<DenseMatrix> svd;
+            svd.compute(B, rank, 1000, Scalar(1e-6));
             m_singularValues = svd.singularValues();
             m_matrixU = Q * svd.matrixU();
             m_matrixV = svd.matrixV();
