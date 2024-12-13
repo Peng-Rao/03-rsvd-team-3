@@ -68,9 +68,9 @@ TEST_CASE("Eigen GivensRotationQR Decomposition Benchmark", "[GivensRotation_ben
             householderQR.compute(dense);
         };
 
-//        BENCHMARK("SparseQR with row-major sparse matrix size " + std::to_string(size)) {
-//            Eigen::SparseQR<Eigen::SparseMatrix<double, Eigen::RowMajor>, Eigen::COLAMDOrdering<int>> sparseQR;
-//            sparseQR.compute(sparse);
-//        };
+        BENCHMARK("GivensRotationQR with row-major sparse matrix size " + std::to_string(size)) {
+            Eigen::SparseQR<Eigen::SparseMatrix<double, Eigen::RowMajor>, Eigen::COLAMDOrdering<int>> sparseQR;
+            sparseQR.compute(sparse);
+        };
     }
 }
