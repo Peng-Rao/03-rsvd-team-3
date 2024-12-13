@@ -19,3 +19,12 @@ target_link_libraries(BenchRSVDMPI PRIVATE Eigen3::Eigen MPI::MPI_CXX)
 target_compile_options(BenchRSVDMPI PRIVATE -O3)
 
 
+add_executable(BenchHouseholder bench_householder.cpp)
+target_link_libraries(BenchHouseholder PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchHouseholder PUBLIC OpenMP::OpenMP_CXX)
+target_compile_options(BenchRSVDMPI PRIVATE -O3 -march=native)
+
+add_executable(BenchGivensRotation bench_givensrotation.cpp)
+target_link_libraries(BenchGivensRotation PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchGivensRotation PUBLIC OpenMP::OpenMP_CXX)
+target_compile_options(BenchGivensRotation PRIVATE -O3 -march=native)
