@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <chrono>
-#include "RandomizedSVD.h"
+#include "RandomizedSVD_MPI.h"
 
 // Test different matrix sizes for better comparison
 std::vector<int> sizes = {10000};
@@ -31,7 +31,7 @@ TEST_CASE("Custom RSVD MPI Implementation Benchmark", "[custom_rsvd_mpi_bench]")
         try {
             Eigen::RandomizedSVD<Eigen::MatrixXd> rsvd;
             Eigen::setNbThreads(8);
-            rsvd.compute_mpi(testMatrix, rank, powerIterations);
+            rsvd.compute(testMatrix, rank, powerIterations);
             
             // Only synchronize after MPI computation
             MPI_Barrier(MPI_COMM_WORLD);
