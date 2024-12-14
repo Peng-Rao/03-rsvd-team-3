@@ -53,4 +53,3 @@ TEST_CASE("RandomizedSVD on Hilbert matrix", "[rsvd_hilbert]") {
     // INFO("Orthogonality error of V for Hilbert: " << orth_err_V);
     // REQUIRE(orth_err_V < 1e-6);
 }
-
