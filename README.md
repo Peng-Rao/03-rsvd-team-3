@@ -72,7 +72,6 @@ export CXX=/opt/homebrew/opt/llvm/bin/clang++
 export LDFLAGS="-L/opt/homebrew/opt/libomp/bin"
 export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
 export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
-
 ```
 And then `MacOS` environment settings completed.
 
@@ -136,6 +135,18 @@ cmake --build build
 ./build/benchmarks/BenchRSVD
 ```
 
+# Benchmarks
+We have implemented a benchmark to compare the performance of our implementation. The benchmark is run on a dense matrix of size 1000x1000 and a sparse matrix of size 1000x1000. The benchmark measures the time taken to compute the SVD of the matrix using our implementation and the `Eigen` library. The results show that our implementation is faster than the `Eigen` library for both dense and sparse matrices.
+
+| Benchmark Name                        | Size  | Mean          | Low Mean      | High Mean     |
+|---------------------------------------|-------|---------------|---------------|---------------|
+| GivensRotationQR with sparse matrix   | 100   | 2.14231 ms    | 2.13479 ms    | 2.15039 ms    |
+| GivensRotationQR with sparse matrix   | 200   | 11.9559 ms    | 11.9181 ms    | 11.9883 ms    |
+| GivensRotationQR with sparse matrix   | 300   | 38.4835 ms    | 38.3569 ms    | 38.6319 ms    |
+| GivensRotationQR with sparse matrix   | 400   | 86.3512 ms    | 86.2812 ms    | 86.4386 ms    |
+| GivensRotationQR with sparse matrix   | 500   | 162.965 ms    | 161.811 ms    | 166.101 ms    |
+| GivensRotationQR with sparse matrix   | 600   | 279.566 ms    | 278.516 ms    | 281.161 ms    |
+| GivensRotationQR with sparse matrix   | 700   | 435.05 ms     | 433.854 ms    | 436.587 ms    |
 # RandomizedSVD.h code explanation
 The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 
 It is written using the Eigen namespace. 
