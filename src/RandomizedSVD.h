@@ -10,7 +10,6 @@
 #include <Eigen/Sparse>
 
 #include <random>
-#include <iostream>
 
 namespace Eigen {
 
@@ -207,20 +206,13 @@ namespace Eigen {
         void randomProjection(const SparseMatrixType &matrix, Index rank, Index powerIterations) {
             // Step 1: Generate a random Gaussian dense matrix
             DenseMatrix randomMatrix = generateRandomMatrix(matrix.cols(), rank);
-            std::cout << "randomMatrix.rows() = " << randomMatrix.rows() << " randomMatrix.cols() = " << randomMatrix.cols() << std::endl;
-            std::cout << "__________1_________" << std::endl;
             // Step 2: Form the initial sketch matrix (Q = A * Omega)
             SparseMatrixType sketch = (matrix * randomMatrix).sparseView();
-            std::cout << "__________2_________" << std::endl;
             // Step 3: Perform power iterations to enhance the approximation
-            // the dimension of the sketch matrix
-            std::cout << "matrix.rows() = " << matrix.rows() << " matrix.cols() = " << matrix.cols() << std::endl;
-            std::cout << "sketch.rows() = " << sketch.rows() << " sketch.cols() = " << sketch.cols() << std::endl;
             for (Index i = 0; i < powerIterations; ++i) {
                 // Multiply by A^T * A
                 sketch = matrix * (matrix.transpose() * sketch);
             }
-            std::cout << "__________3_________" << std::endl;
             // Step 4: Compute the QR decomposition of the sketch
             GivensRotationQR<SparseMatrixType> qr;
             qr.compute(sketch);
