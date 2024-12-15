@@ -27,11 +27,12 @@ export VCPKG_ROOT=... # your vcpkg path
 export PATH=$VCPKG_ROOT:$PATH
 
 # Add llvm to PATH
-export CC=/usr/local/opt/llvm/bin/clang
-export CXX=/usr/local/opt/llvm/bin/clang++
-export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
+export CC=/opt/homebrew/opt/llvm/bin/clang
+export CXX=/opt/homebrew/opt/llvm/bin/clang++
+export LDFLAGS="-L/opt/homebrew/opt/libomp/bin"
 export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
-export PATH="/usr/local/opt/llvm/bin:$PATH"
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+
 ```
 And then `MacOS` environment settings completed.
 
