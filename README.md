@@ -1,6 +1,59 @@
 # Randomized SVD
+- [Overview](#overview)
+- [Algorithms description](#algorithms-description)
+  + [PowerMethod SVD](#powermethod-svd)
+- [Project setup](#project-setup)
+  + [MacOS setup](#macos-setup)
+  + [Windows setup](#windows-setup)
+  + [Compiler setup](#compiler-setup)
+  + [Build the project](#build-the-project)
+- [RandomizedSVD.h code explanation](#randomizedsvdh-code-explanation)
 
-[TOC]
+## Overview
+This project is a C++ implementation of the **Randomized Singular Value Decomposition (rSVD)** algorithm. We only used the matrix operations of the `Eigen` library to implement our algorithm. We do some benchmarks to compare the performance of our implementation with the `Eigen` library, the result indicates that our implementation can enhance the performance of handling large or sparse matrices.
+
+## Algorithms description
+
+### PowerMethod SVD
+The `PowerMethodSVD` class is a template-based implementation for computing the Singular Value Decomposition (SVD) of a matrix (dense or sparse) using the **Power Method with Deflation**. This approach is designed for approximating a few dominant singular values and their associated singular vectors efficiently.
+
+In order to make the operation more efficient, we have optimized the algorithm. Alternately apply matrix A and its transpose $A^T$, thereby implicitly performing the power method on $A^T A$ without explicitly constructing $A^T A$.
+
+To compute the largest singular value  $\sigma_1$  and its corresponding singular vectors  $u_1$  and  $v_1$ , perform the following steps:
+1. Initialize $v_1$ as a random vector:
+$$
+v_1 \leftarrow \text{random vector of size } n
+$$
+2. Normalize $v_1$ :
+$$
+v_1 \leftarrow \frac{v_1}{\|v_1\|}
+$$
+3. Iteratively compute:
+   - Left singular vector:
+     $$
+     u_1 \leftarrow \frac{A v_1}{\|A v_1\|}
+     $$
+   - Right singular vector:
+     $$
+     v_1 \leftarrow \frac{A^\top u_1}{\|A^\top u_1\|}
+     $$
+   - Convergence is checked by monitoring the change in $v_1$:
+     $$
+     \|v_1^{(t+1)} - v_1^{(t)}\| < \text{tol}
+     $$
+4. After convergence, the largest singular value is:
+   $$
+   \sigma_1 = \|A v_1\|
+   $$
+5. Normalize $u_1$ to ensure consistency:
+   $$
+   u_1 = \frac{A v_1}{\sigma_1}
+   $$
+
+ After computing $\sigma_1, u_1, v_1$, deflate $A$ to remove the contribution of the largest singular component:
+ $$
+ A \leftarrow A - \sigma_1 u_1 v_1^\top
+ $$
 
 ## Project setup
 We use `CMake` to build the project, and `Vcpkg` to manage dependencies, our project can run across platforms.
