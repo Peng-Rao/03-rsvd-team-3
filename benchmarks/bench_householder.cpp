@@ -18,16 +18,16 @@ std::vector<Eigen::MatrixXd> generateDenseMatrices(const int startSize, const in
     return denseMatrices;
 }
 
-std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> generateSparseMatrices(const int startSize, const int endSize,
+std::vector<Eigen::SparseMatrix<double>> generateSparseMatrices(const int startSize, const int endSize,
                                                                                  const int step, const double sparsity) {
-    std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> sparseMatrices;
+    std::vector<Eigen::SparseMatrix<double>> sparseMatrices;
     sparseMatrices.reserve((endSize - startSize) / step + 1);
 
     std::mt19937 gen(42);
     std::uniform_real_distribution dis(0.0, 1.0);
 
     for(int size = startSize; size <= endSize; size += step) {
-        Eigen::SparseMatrix<double, Eigen::RowMajor> sparse(size, size);
+        Eigen::SparseMatrix<double> sparse(size, size);
         std::vector<Eigen::Triplet<double>> tripletList;
         tripletList.reserve(static_cast<int>(size * size * sparsity));
 
@@ -66,9 +66,9 @@ TEST_CASE("Eigen Householder Decomposition Benchmark", "[householder_bench_dynam
             householderQR.compute(dense);
         };
 
-        BENCHMARK("SparseQR with row-major sparse matrix size " + std::to_string(size)) {
+        BENCHMARK("SparseQR with sparse matrix size " + std::to_string(size)) {
             sparse.makeCompressed();
-            Eigen::SparseQR<Eigen::SparseMatrix<double, Eigen::RowMajor>, Eigen::COLAMDOrdering<int>> sparseQR;
+            Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> sparseQR;
             sparseQR.compute(sparse);
         };
     }
