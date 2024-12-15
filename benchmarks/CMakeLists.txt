@@ -28,3 +28,13 @@ add_executable(BenchGivensRotation bench_givensrotation.cpp)
 target_link_libraries(BenchGivensRotation PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(BenchGivensRotation PUBLIC OpenMP::OpenMP_CXX)
 target_compile_options(BenchGivensRotation PRIVATE -O3 -march=native)
+
+add_executable(BenchRandomizedSVD bench_randomizedSVD.cpp)
+target_link_libraries(BenchRandomizedSVD PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchRandomizedSVD PRIVATE Eigen3::Eigen)
+target_compile_options(BenchRandomizedSVD PRIVATE -O3 -march=native)
+
+add_executable(BenchPowerMethod bench_powermethod.cpp)
+target_link_libraries(BenchPowerMethod PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(BenchPowerMethod PRIVATE Eigen3::Eigen)
+target_compile_options(BenchPowerMethod PRIVATE -O3 -march=native)
