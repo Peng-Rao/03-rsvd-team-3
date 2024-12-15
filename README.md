@@ -1,4 +1,7 @@
 # Randomized SVD
+
+[TOC]
+
 ## Project setup
 We use `CMake` to build the project, and `Vcpkg` to manage dependencies, our project can run across platforms.
 
@@ -42,46 +45,58 @@ For Windows, see this guide: https://learn.microsoft.com/en-us/vcpkg/get_started
 
 **Fork** and **Clone** this project to your own repo.
 
-And then write building script, add to project root directory:
-## CMakeUserPresets.json
+### Compiler setup
+For `MacOS`, you can use `clang` or `gcc`, for `Windows`, you can use `MSVC` or `gcc`. First you should add `CMakeUserPresets.json` to the project root directory, for example I have configured the `CMakeUserPresets.json` file as follows, you should replace the compiler path with your own path, and the `VCPKG_ROOT` with your own path:
 ```json
 {
   "version": 2,
   "configurePresets": [
     {
-      "name": "default",
+      "name": "gcc",
       "inherits": "vcpkg",
       "environment": {
-        "VCPKG_ROOT": "xxxxxxxxxxxxxxxxxxxx/vcpkg"
+        "VCPKG_ROOT": "/Users/raopend/vcpkg"
       },
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_C_COMPILER": "/opt/homebrew/bin/gcc-14",
+        "CMAKE_CXX_COMPILER": "/opt/homebrew/bin/g++-14"
+      }
+    },
+    {
+      "name": "clang",
+      "inherits": "vcpkg",
+      "environment": {
+        "VCPKG_ROOT": "/Users/raopend/vcpkg"
+      },
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "CMAKE_C_COMPILER": "/opt/homebrew/opt/llvm/bin/clang",
+        "CMAKE_CXX_COMPILER": "/opt/homebrew/opt/llvm/bin/clang++"
       }
     }
   ]
 }
-
 ```
+You can replace the compiler path with your own path.
 
-Finally, configure the build using CMake:
-
+### Build the project
+After setting up the environment, you can build the project. The keyword `default` is the preset name in the `CMakeUserPresets.json` file, for example, I use the `clang` preset:
 1.  Configure the build using CMake:
-```
-cmake --preset=default
+```bash 
+cmake --preset=clang
 ```
 2. Build the project
-```
+```bash
 cmake --build build
 ```
 3. Run the application
-```
-./build/main
-```
-### or
-```
-mpirun -np 4 ./build/main
+```bash
+./build/benchmarks/BenchRSVD
 ```
 
 # RandomizedSVD.h code explanation
