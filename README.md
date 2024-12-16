@@ -2,6 +2,7 @@
 - [Overview](#overview)
 - [Algorithms description](#algorithms-description)
   + [PowerMethod SVD](#powermethod-svd)
+  + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
 - [Project setup](#project-setup)
   + [MacOS setup](#macos-setup)
   + [Windows setup](#windows-setup)
