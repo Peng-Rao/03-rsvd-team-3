@@ -13,7 +13,7 @@ target_link_libraries(BenchRSVD PRIVATE OpenBLAS::OpenBLAS)
 target_compile_options(BenchRSVD PRIVATE -O3 -march=native)
 
 # config for MPI RSVD benchmarks
-add_executable(BenchRSVDMPI bench_myRSVD_mpi.cpp)
+add_executable(BenchRSVDMPI bench_rsvd_mpi.cpp)
 target_link_libraries(BenchRSVDMPI PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(BenchRSVDMPI PRIVATE Eigen3::Eigen MPI::MPI_CXX)
 target_compile_options(BenchRSVDMPI PRIVATE -O3)

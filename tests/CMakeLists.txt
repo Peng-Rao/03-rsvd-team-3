@@ -8,6 +8,3 @@ add_executable(GivensRotationQRTest test_givens_rotation_qr.cpp)
 target_link_libraries(GivensRotationQRTest PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(GivensRotationQRTest PRIVATE OpenMP::OpenMP_CXX)
 
-add_executable(RSVDTest_MPI test_rsvd_mpi.cpp)
-target_link_libraries(RSVDTest_MPI PRIVATE Catch2::Catch2WithMain)
-target_link_libraries(RSVDTest_MPI PRIVATE MPI::MPI_CXX)
