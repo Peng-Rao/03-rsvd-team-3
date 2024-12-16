@@ -220,6 +220,22 @@ We have implemented a benchmark to compare the performance of our implementation
 | GivensRotationQR with sparse matrix   | 500   | 162.965 ms    | 161.811 ms    | 166.101 ms    |
 | GivensRotationQR with sparse matrix   | 600   | 279.566 ms    | 278.516 ms    | 281.161 ms    |
 | GivensRotationQR with sparse matrix   | 700   | 435.05 ms     | 433.854 ms    | 436.587 ms    |
+
+
+# RandomizedSVD algorithm overview
+Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
+The larger the matrix, the higher the computational advantages of this algorithm are, considering that classical SVD computation requires 𝑂(𝑚𝑛 min(𝑚,𝑛)) operations. It's expecially efficient when the matrix is sparse or when only a small subset of singular values and vectors is needed.
+
+The steps of the algorithm are:
+1. Generate a projection S of the input matrix A on a random subspace, defined by a random Gaussian matrix, to reduce its column space dimensionality (rank) and capture its dominant structure;
+2. Orthogonalize S by using QR decomposition;
+3. Project A onto the subspace defined by Q to reduce the size of A. Call this projection B;
+4. Compute a more efficient SVD on the smaller matrix B;
+5. Recover the approximate SVD of A.
+
+rSVD reaches a complexity of O(m*n*k)+O(k^2 *n)+O(k^3), where 
+𝑘 is the reduced rank of A. This is faster than classical SVD if k<< min(m,n).
+
 # RandomizedSVD.h code explanation
 The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 
 It is written using the Eigen namespace. 
