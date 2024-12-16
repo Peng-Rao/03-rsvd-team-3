@@ -2,6 +2,7 @@
 - [Overview](#overview)
 - [Algorithms description](#algorithms-description)
   + [PowerMethod SVD](#powermethod-svd)
+  + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
 - [Project setup](#project-setup)
   + [MacOS setup](#macos-setup)
   + [Windows setup](#windows-setup)
@@ -21,23 +22,95 @@ In order to make the operation more efficient, we have optimized the algorithm. 
 
 To compute the largest singular value  $\sigma_1$  and its corresponding singular vectors  $u_1$  and  $v_1$ , perform the following steps:
 1. Initialize $v_1$ as a random vector:
-$$v_1 \leftarrow \text{random vector of size } n$$
-2. Normalize $v_1$ :
-$$v_1 \leftarrow \frac{v_1}{\|v_1\|}$$
-3. Iteratively compute:
-   - Left singular vector:
-     $$u_1 \leftarrow \frac{A v_1}{\|A v_1\|}$$
-   - Right singular vector:
-     $$v_1 \leftarrow \frac{A^\top u_1}{\|A^\top u_1\|}$$
-   - Convergence is checked by monitoring the change in $v_1$:
-     $$\|v_1^{(t+1)} - v_1^{(t)}\| < \text{tol}$$
-4. After convergence, the largest singular value is:
-   $$\sigma_1 = \|A v_1\|$$
-5. Normalize $u_1$ to ensure consistency:
-   $$u_1 = \frac{A v_1}{\sigma_1}$$
 
- After computing $\sigma_1, u_1, v_1$, deflate $A$ to remove the contribution of the largest singular component:
- $$A \leftarrow A - \sigma_1 u_1 v_1^\top$$
+$$
+v_1 \leftarrow \text{random vector of size } n
+$$
+
+2. Normalize $v_1$ :
+
+$$
+v_1 \leftarrow \frac{v_1}{\|v_1\|}
+$$
+
+3. Iteratively compute:
+- Left singular vector:
+   
+$$
+u_1 \leftarrow \frac{A v_1}{\|A v_1\|}
+$$
+
+- Right singular vector:
+   
+$$
+v_1 \leftarrow \frac{A^\top u_1}{\|A^\top u_1\|}
+$$
+
+- Convergence is checked by monitoring the change in $v_1$:
+   
+$$
+\|v_1^{(t+1)} - v_1^{(t)}\| < \text{tol}
+$$
+
+4. After convergence, the largest singular value is:
+   
+$$
+\sigma_1 = \|A v_1\|
+$$
+
+5. The left singular vector is computed as:
+
+$$
+u_1 = \frac{A v_1}{\sigma_1}
+$$
+
+After computing $\sigma_1, u_1, v_1$, deflate $A$ to remove the contribution of the largest singular component:
+
+$$
+A \leftarrow A - \sigma_1 u_1 v_1^\top
+$$
+
+### Givens Rotation QR Decomposition
+The `GivensRotationQR` class is a template-based implementation for computing the QR decomposition of a matrix using the **Givens Rotation** method. This approach is designed for sparse matrices, because of generics, it can be used for both dense and sparse matrices.
+
+The **Givens Rotation QR** decomposition is a method for decomposing a matrix $A$ into an orthogonal matrix $Q$ and an upper triangular matrix $R$, such that:
+
+$$
+A = Q \cdot R
+$$
+
+A Givens rotation matrix is used to zero out specific elements of a matrix. For two elements $a$ and $b$, the Givens rotation coefficients $c$ and $s$ are computed as:
+
+$$
+r = \sqrt{a^2 + b^2}, \quad c = \frac{a}{r}, \quad s = -\frac{b}{r}
+$$
+
+The Givens rotation matrix for rows $i$ and $k$ is:
+
+$$
+G(i, k) =
+\begin{bmatrix}
+1 & \cdots & 0 & \cdots & 0 & \cdots & 0 \\
+\vdots & \ddots & \vdots & \vdots & \vdots & \vdots & \vdots \\
+0 & \cdots & c & \cdots & -s & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots & \vdots \\
+0 & \cdots & s & \cdots & c & \cdots & 0 \\
+\vdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & \cdots & 0 & \cdots & 0 & \cdots & 1
+\end{bmatrix}
+$$
+
+The steps for the Givens Rotation QR decomposition are:
+1. Initialize $R$ as a copy of the input matrix $A$ and $Q$ as the identity matrix.
+2. For each column $j$:
+    - Apply Givens rotations to zero out elements below the diagonal in column $j$.
+    - Update $R$ by applying Givens rotations from the left.
+    - Accumulate rotations into $Q$ by applying Givens rotations from the right (transpose of $G$).
+3. Return $Q$ and $R$.
+
+For step2 we do some optimizations:
+- Instead of applying matrix multiplications: $Q = I \times G_1^T \times G_2^T \times ... \times G_n^T$ and $R = G_n \times ... \times G_2 \times G_1 \times A$, we apply Gi vens rotations directly to the rows of $R$ and $Q$. We use eigen's vectorized operations instead of dual loops.
+- Instead of computing the transpose of the rotation matrix, we apply the rotation to the columns of the matrix.
 
 ## Project setup
 We use `CMake` to build the project, and `vcpkg` to manage dependencies, our project can run across platforms.

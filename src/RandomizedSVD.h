@@ -1,5 +1,5 @@
 #ifndef RANDOMIZEDSVD_H
-#define RANDOMIZEDSVD_H  //guards to protect against multiple inclusions of the same header file
+#define RANDOMIZEDSVD_H
 
 #include "MatrixTraits.h"
 #include "PowerMethodSVD.h"
