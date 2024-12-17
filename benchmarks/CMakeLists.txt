@@ -1,10 +1,3 @@
-
-# config for MPI RSVD benchmarks
-add_executable(BenchRSVDMPI bench_rsvd_mpi.cpp)
-target_link_libraries(BenchRSVDMPI PRIVATE Catch2::Catch2WithMain)
-target_link_libraries(BenchRSVDMPI PRIVATE Eigen3::Eigen MPI::MPI_CXX)
-target_compile_options(BenchRSVDMPI PRIVATE -O3)
-
 add_executable(BenchHouseholder bench_householder.cpp)
 target_link_libraries(BenchHouseholder PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(BenchHouseholder PUBLIC OpenMP::OpenMP_CXX)

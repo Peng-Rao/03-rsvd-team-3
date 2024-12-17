@@ -1,11 +1,6 @@
 #include "RandomizedSVD_MPI.h"
-#include <catch2/catch_test_macros.hpp>
 #include <Eigen/Dense>
 #include <mpi.h>
-
-#include <Eigen/Dense>
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/benchmark/catch_benchmark.hpp>
 #include <thread>
 #include <vector>
 #include <string>
@@ -23,7 +18,7 @@ void setEigenThreads(int numThreads) {
     Eigen::setNbThreads(numThreads);
 }
 
-TEST_CASE("RSVD mpi", "[rsvd_mpi]") {
+int main() {
     auto start = std::chrono::high_resolution_clock::now();
     MPI_Init(nullptr, nullptr);
 
@@ -36,7 +31,9 @@ TEST_CASE("RSVD mpi", "[rsvd_mpi]") {
 
     setEigenThreads(1);
     
-    rsvd.generateRandomMatrix(1000, 1000);
+    Eigen::MatrixXd A = Eigen::MatrixXd::Random(2000, 2000);
+    rsvd.compute(A, 100, 2);
+
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> elapsed = end - start;
 
@@ -45,4 +42,5 @@ TEST_CASE("RSVD mpi", "[rsvd_mpi]") {
     }
 
     MPI_Finalize();
+    return 0;
 }
