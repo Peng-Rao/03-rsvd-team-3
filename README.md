@@ -5,7 +5,7 @@
   + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
 - [Project setup](#project-setup)
   + [MacOS setup](#macos-setup)
-  + [Windows setup](#windows-setup)
+  + [Windows WSL2 setup](#windows-wsl2-setup)
   + [Compiler setup](#compiler-setup)
   + [Build the project](#build-the-project)
 - [RandomizedSVD.h code explanation](#randomizedsvdh-code-explanation)
@@ -148,9 +148,22 @@ export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
 ```
 And then `MacOS` environment settings completed.
 
-### Windows setup
+### Windows WSL2 setup
 
-For Windows, see this guide: https://learn.microsoft.com/en-us/vcpkg/get_started/get-started/
+
+1. install CMake and Vcpkg
+```bash
+sudo apt update
+sudo apt install cmake
+git clone https://github.com/microsoft/vcpkg "$HOME/vcpkg"
+$HOME/vcpkg/bootstrap-vcpkg.sh
+```
+2. set vcpkg to PATH
+```bash
+echo 'export VCPKG_ROOT=$HOME/vcpkg' >> ~/.bashrc
+echo 'export PATH=$VCPKG_ROOT:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
 
 **Fork** and **Clone** this project to your own repo.
 
@@ -221,6 +234,48 @@ We have implemented a benchmark to compare the performance of our implementation
 | GivensRotationQR with sparse matrix   | 600   | 279.566 ms    | 278.516 ms    | 281.161 ms    |
 | GivensRotationQR with sparse matrix   | 700   | 435.05 ms     | 433.854 ms    | 436.587 ms    |
 
+## MPI Optimization Results
+We implemented MPI parallelization for two key components of our algorithm:
+1. Random Matrix Generation in RSVD
+2. Givens Rotation QR Decomposition
+
+### Random Matrix Generation (2000x2000 matrix)
+The following table shows the performance of parallel random matrix generation using different numbers of MPI processes:
+
+| Number of Processes | Execution Time (seconds) | Speedup |
+|--------------------|-------------------------|---------|
+| 1                  | 0.891                  | 1.00x   |
+| 2                  | 0.894                  | 1.00x   |
+| 4                  | 0.761                  | 1.17x   |
+| 8                  | 0.903                  | 0.99x   |
+
+For random matrix generation, increasing the number of processes did not significantly improve performance. This is likely due to the communication overhead outweighing the computational benefits for this operation.
+
+### Givens Rotation QR Decomposition (1000x1000 matrix)
+The parallel implementation of Givens Rotation QR shows significant improvement with increased processes:
+
+| Number of Processes | Execution Time (ms) | Speedup |
+|--------------------|---------------------|---------|
+| 1                  | 2128               | 1.00x   |
+| 2                  | 1159               | 1.84x   |
+| 4                  | 668                | 3.19x   |
+| 8                  | 519                | 4.10x   |
+
+The Givens Rotation QR decomposition shows excellent scaling with increased processes, achieving a 4.10x speedup with 8 processes. This demonstrates that our MPI implementation is particularly effective for computationally intensive matrix operations.
+
+### Analysis
+1. Random Matrix Generation:
+   - The parallel implementation showed no significant speedup
+   - Communication overhead likely dominates the computation time
+   - Best performance achieved with single process
+
+2. Givens Rotation QR:
+   - Shows near-linear speedup up to 4 processes
+   - Continues to improve with 8 processes
+   - Demonstrates good parallel efficiency
+   - Communication overhead is well-balanced with computational work
+
+These results suggest that MPI parallelization is most effective for computationally intensive operations like QR decomposition, while simpler operations like random matrix generation may not benefit from parallelization due to communication overhead.
 
 # RandomizedSVD algorithm overview
 Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
