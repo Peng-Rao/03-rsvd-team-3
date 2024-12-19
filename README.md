@@ -3,11 +3,13 @@
 - [Algorithms description](#algorithms-description)
   + [PowerMethod SVD](#powermethod-svd)
   + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
+  + [RandomizedSVD](#randomizedsvd)
 - [Project setup](#project-setup)
   + [MacOS setup](#macos-setup)
   + [Windows WSL2 setup](#windows-wsl2-setup)
   + [Compiler setup](#compiler-setup)
   + [Build the project](#build-the-project)
+- [Benchmarks](#benchmarks)
 - [RandomizedSVD.h code explanation](#randomizedsvdh-code-explanation)
 
 ## Overview
@@ -35,19 +37,19 @@ $$
 
 3. Iteratively compute:
 - Left singular vector:
-   
+  
 $$
 u_1 \leftarrow \frac{A v_1}{\|A v_1\|}
 $$
 
 - Right singular vector:
-   
+  
 $$
 v_1 \leftarrow \frac{A^\top u_1}{\|A^\top u_1\|}
 $$
 
 - Convergence is checked by monitoring the change in $v_1$:
-   
+  
 $$
 \|v_1^{(t+1)} - v_1^{(t)}\| < \text{tol}
 $$
@@ -111,6 +113,22 @@ The steps for the Givens Rotation QR decomposition are:
 For step2 we do some optimizations:
 - Instead of applying matrix multiplications: $Q = I \times G_1^T \times G_2^T \times ... \times G_n^T$ and $R = G_n \times ... \times G_2 \times G_1 \times A$, we apply Gi vens rotations directly to the rows of $R$ and $Q$. We use eigen's vectorized operations instead of dual loops.
 - Instead of computing the transpose of the rotation matrix, we apply the rotation to the columns of the matrix.
+
+### RandomizedSVD
+Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
+The larger the matrix, the higher the computational advantages of this algorithm are, considering that classical SVD computation requires 𝑂(𝑚𝑛 min(𝑚,𝑛)) operations. It's expecially efficient when the matrix is sparse or when only a small subset of singular values and vectors is needed.
+
+The steps of the algorithm are:
+1. Draw an $n \times k$ Gaussian random matrix $\Omega$
+2. From the $m \times k$ sketch matrix $Y=A \Omega$
+3. From an $m \times k$ othonormal matrix $Q$ such that $Y=QR$
+4. From the $n \times k$ matrix $B=Q^TA$
+5. Compute the SVD of $\hat{U} \Sigma V^{T}$
+6. From the matrix $U=Q\hat{U}$
+
+rSVD reaches a complexity of $O(m*n*k)+O(k^2 *n)+O(k^3)$, where
+$k$ is the reduced rank of $A$. This is faster than classical SVD if $k<< min(m,n)$.
+
 
 ## Project setup
 We use `CMake` to build the project, and `vcpkg` to manage dependencies, our project can run across platforms.
@@ -276,20 +294,6 @@ The Givens Rotation QR decomposition shows excellent scaling with increased proc
    - Communication overhead is well-balanced with computational work
 
 These results suggest that MPI parallelization is most effective for computationally intensive operations like QR decomposition, while simpler operations like random matrix generation may not benefit from parallelization due to communication overhead.
-
-# RandomizedSVD algorithm overview
-Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
-The larger the matrix, the higher the computational advantages of this algorithm are, considering that classical SVD computation requires 𝑂(𝑚𝑛 min(𝑚,𝑛)) operations. It's expecially efficient when the matrix is sparse or when only a small subset of singular values and vectors is needed.
-
-The steps of the algorithm are:
-1. Generate a projection S of the input matrix A on a random subspace, defined by a random Gaussian matrix, to reduce its column space dimensionality (rank) and capture its dominant structure;
-2. Orthogonalize S by using QR decomposition;
-3. Project A onto the subspace defined by Q to reduce the size of A. Call this projection B;
-4. Compute a more efficient SVD on the smaller matrix B;
-5. Recover the approximate SVD of A.
-
-rSVD reaches a complexity of O(m*n*k)+O(k^2 *n)+O(k^3), where 
-𝑘 is the reduced rank of A. This is faster than classical SVD if k<< min(m,n).
 
 # RandomizedSVD.h code explanation
 The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 
