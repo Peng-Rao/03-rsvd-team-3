@@ -252,48 +252,26 @@ We have implemented a benchmark to compare the performance of our implementation
 | GivensRotationQR with sparse matrix   | 600   | 279.566 ms    | 278.516 ms    | 281.161 ms    |
 | GivensRotationQR with sparse matrix   | 700   | 435.05 ms     | 433.854 ms    | 436.587 ms    |
 
-## MPI Optimization Results
-We implemented MPI parallelization for two key components of our algorithm:
-1. Random Matrix Generation in RSVD
-2. Givens Rotation QR Decomposition
+## MPI & OMP Example
+```bash
+mpirun -np 4 ./build/profiling/mpi_omp_random_matrix
+```
+We have implemented benchmarks to compare the performance to generate random matrix using MPI and OpenMP. The following table summarizes the results:
 
-### Random Matrix Generation (2000x2000 matrix)
-The following table shows the performance of parallel random matrix generation using different numbers of MPI processes:
+| Configuration                        | Number of Processes | Time Taken (seconds) |
+|--------------------------------------|---------------------|----------------------|
+| RandomMTX mpi                             | 1                   | 0.954016             |
+| RandomMTX mpi                             | 2                   | 0.686535             |
+| RandomMTX mpi                             | 4                   | 0.594157             |
+| RandomMTX mpi_omp                         | 1                   | 0.998558             |
+| RandomMTX mpi_omp                         | 2                   | 3.01405              |
+| RandomMTX mpi_omp                         | 4                   | 0.635416              |
+| RandomMTX omp                             | 1                   | ***0.0920939***           |
 
-| Number of Processes | Execution Time (seconds) | Speedup |
-|--------------------|-------------------------|---------|
-| 1                  | 0.891                  | 1.00x   |
-| 2                  | 0.894                  | 1.00x   |
-| 4                  | 0.761                  | 1.17x   |
-| 8                  | 0.903                  | 0.99x   |
-
-For random matrix generation, increasing the number of processes did not significantly improve performance. This is likely due to the communication overhead outweighing the computational benefits for this operation.
-
-### Givens Rotation QR Decomposition (1000x1000 matrix)
-The parallel implementation of Givens Rotation QR shows significant improvement with increased processes:
-
-| Number of Processes | Execution Time (ms) | Speedup |
-|--------------------|---------------------|---------|
-| 1                  | 2128               | 1.00x   |
-| 2                  | 1159               | 1.84x   |
-| 4                  | 668                | 3.19x   |
-| 8                  | 519                | 4.10x   |
-
-The Givens Rotation QR decomposition shows excellent scaling with increased processes, achieving a 4.10x speedup with 8 processes. This demonstrates that our MPI implementation is particularly effective for computationally intensive matrix operations.
-
+![alt text](image.png)
 ### Analysis
-1. Random Matrix Generation:
-   - The parallel implementation showed no significant speedup
-   - Communication overhead likely dominates the computation time
-   - Best performance achieved with single process
-
-2. Givens Rotation QR:
-   - Shows near-linear speedup up to 4 processes
-   - Continues to improve with 8 processes
-   - Demonstrates good parallel efficiency
-   - Communication overhead is well-balanced with computational work
-
-These results suggest that MPI parallelization is most effective for computationally intensive operations like QR decomposition, while simpler operations like random matrix generation may not benefit from parallelization due to communication overhead.
+- Notably, the "RandomMTX omp" configuration with 1 process shows an outstanding performance with a time taken of just 0.0920939 seconds, which is the fastest.
+- Excessive parallelization may lead to a huge amount of creation and destruction of resources, and as a result, the performance may turn out to be worse.
 
 # RandomizedSVD.h code explanation
 The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 

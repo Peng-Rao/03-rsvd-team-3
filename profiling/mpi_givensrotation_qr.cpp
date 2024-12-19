@@ -51,6 +51,13 @@ int main(int argc, char** argv) {
         auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
         std::cout << "QR decomposition time: " << duration.count() << " ms" << std::endl;
+
+        Eigen::MatrixXd Q = givens_rotation_qr.matrixQ();
+        Eigen::MatrixXd R = givens_rotation_qr.matrixR();
+        Eigen::MatrixXd QR = Q * R;
+    
+        double frobenius_norm = (sparseMatrix - QR).norm();
+        std::cout << "Frobenius err norm: " << frobenius_norm << std::endl;
     }
 
     MPI_Finalize();

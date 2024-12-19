@@ -22,17 +22,24 @@ target_link_libraries(givensrotation_qr_profiling PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(givensrotation_qr_profiling PRIVATE OpenBLAS::OpenBLAS)
 target_compile_options(givensrotation_qr_profiling PRIVATE -O3 -march=native)
 
-add_executable(mpi_givensrotation_qr mpi_givensrotation_qr.cpp)
-target_link_libraries(mpi_givensrotation_qr PRIVATE Eigen3::Eigen MPI::MPI_CXX)
-target_link_libraries(mpi_givensrotation_qr PRIVATE OpenMP::OpenMP_CXX)
-target_link_libraries(mpi_givensrotation_qr PRIVATE OpenBLAS::OpenBLAS)
-target_compile_options(mpi_givensrotation_qr PRIVATE -O3 -march=native)
-
 add_executable(mpi_random_matrix mpi_random_matrix.cpp)
 target_link_libraries(mpi_random_matrix PRIVATE Eigen3::Eigen MPI::MPI_CXX)
 target_link_libraries(mpi_random_matrix PRIVATE OpenMP::OpenMP_CXX)
 target_link_libraries(mpi_random_matrix PRIVATE OpenBLAS::OpenBLAS)
 target_compile_options(mpi_random_matrix PRIVATE -O3 -march=native)
+
+add_executable(omp_random_matrix omp_random_matrix.cpp)
+target_link_libraries(omp_random_matrix PRIVATE Eigen3::Eigen MPI::MPI_CXX)
+target_link_libraries(omp_random_matrix PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(omp_random_matrix PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(omp_random_matrix PRIVATE -O3 -march=native)
+
+
+add_executable(mpi_omp_random_matrix mpi_omp_random_matrix.cpp)
+target_link_libraries(mpi_omp_random_matrix PRIVATE Eigen3::Eigen MPI::MPI_CXX)
+target_link_libraries(mpi_omp_random_matrix PRIVATE OpenMP::OpenMP_CXX)
+target_link_libraries(mpi_omp_random_matrix PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(mpi_omp_random_matrix PRIVATE -O3 -march=native)
 
 add_executable(mpi_rsvd mpi_rsvd.cpp)
 target_link_libraries(mpi_rsvd PRIVATE Eigen3::Eigen MPI::MPI_CXX)
