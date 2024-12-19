@@ -1,5 +1,6 @@
 # Randomized SVD
 - [Overview](#overview)
+- [Programming Paradigm](#programming-paradigm)
 - [Algorithms description](#algorithms-description)
   + [PowerMethod SVD](#powermethod-svd)
   + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
