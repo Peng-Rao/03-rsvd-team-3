@@ -15,6 +15,18 @@
 ## Overview
 This project is a C++ implementation of the **Randomized Singular Value Decomposition (rSVD)** algorithm. We only used the matrix operations of the `Eigen` library to implement our algorithm. We do some benchmarks to compare the performance of our implementation with the `Eigen` library, the result indicates that our implementation can enhance the performance of handling large or sparse matrices.
 
+## Programming Paradigm
+Our project leverages template programming to provide flexible and efficient implementations of key linear algebra algorithms. Specifically, the classes `GivensRotationQR`, `PowerMethodSVD`, and `RandomizedSVD` are designed to accommodate a wide range of data types and storage formats. These classes support both dense and sparse matrices. For example:
+```
+// Dense matrix
+Eigen::RandomizedSVD<double, Eigen::Dynamic, Eigen::Dynamic> rsvd;
+
+// Sparse matrix
+Eigen::RandomizedSVD<Eigen::SparseMatrix<double>>
+
+// Row-major matrix
+Eigen::RandomizedSVD<Eigen::SparseMatrix<double, Eigen::RowMajor>>
+```
 ## Algorithms description
 
 ### PowerMethod SVD
