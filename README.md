@@ -3,12 +3,14 @@
 - [Algorithms description](#algorithms-description)
   + [PowerMethod SVD](#powermethod-svd)
   + [Givens Rotation QR Decomposition](#givens-rotation-qr-decomposition)
+  + [RandomizedSVD](#randomizedsvd)
 - [Project setup](#project-setup)
   + [MacOS setup](#macos-setup)
   + [Windows WSL2 setup](#windows-wsl2-setup)
   + [Compiler setup](#compiler-setup)
   + [Build the project](#build-the-project)
-- [RandomizedSVD.h code explanation](#randomizedsvdh-code-explanation)
+- [Benchmarks](#benchmarks)
+- [MPI & OMP Example](#mpi--omp-example)
 
 ## Overview
 This project is a C++ implementation of the **Randomized Singular Value Decomposition (rSVD)** algorithm. We only used the matrix operations of the `Eigen` library to implement our algorithm. We do some benchmarks to compare the performance of our implementation with the `Eigen` library, the result indicates that our implementation can enhance the performance of handling large or sparse matrices.
@@ -35,19 +37,19 @@ $$
 
 3. Iteratively compute:
 - Left singular vector:
-   
+  
 $$
 u_1 \leftarrow \frac{A v_1}{\|A v_1\|}
 $$
 
 - Right singular vector:
-   
+  
 $$
 v_1 \leftarrow \frac{A^\top u_1}{\|A^\top u_1\|}
 $$
 
 - Convergence is checked by monitoring the change in $v_1$:
-   
+  
 $$
 \|v_1^{(t+1)} - v_1^{(t)}\| < \text{tol}
 $$
@@ -111,6 +113,22 @@ The steps for the Givens Rotation QR decomposition are:
 For step2 we do some optimizations:
 - Instead of applying matrix multiplications: $Q = I \times G_1^T \times G_2^T \times ... \times G_n^T$ and $R = G_n \times ... \times G_2 \times G_1 \times A$, we apply Gi vens rotations directly to the rows of $R$ and $Q$. We use eigen's vectorized operations instead of dual loops.
 - Instead of computing the transpose of the rotation matrix, we apply the rotation to the columns of the matrix.
+
+### RandomizedSVD
+Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
+The larger the matrix, the higher the computational advantages of this algorithm are, considering that classical SVD computation requires 𝑂(𝑚𝑛 min(𝑚,𝑛)) operations. It's expecially efficient when the matrix is sparse or when only a small subset of singular values and vectors is needed.
+
+The steps of the algorithm are:
+1. Draw an $n \times k$ Gaussian random matrix $\Omega$
+2. From the $m \times k$ sketch matrix $Y=A \Omega$
+3. From an $m \times k$ orthonormal matrix $Q$ such that $Y=QR$
+4. From the $n \times k$ matrix $B=Q^TA$
+5. Compute the SVD of $\hat{U} \Sigma V^{T}$
+6. From the matrix $U=Q\hat{U}$
+
+rSVD reaches a complexity of $O(m \times n \times k) + O(k^2 \times n) + O(k^3)$, where
+$k$ is the reduced rank of $A$. This is faster than classical SVD if $k<< min(m,n)$.
+
 
 ## Project setup
 We use `CMake` to build the project, and `vcpkg` to manage dependencies, our project can run across platforms.
@@ -224,15 +242,12 @@ cmake --build build
 # Benchmarks
 We have implemented a benchmark to compare the performance of our implementation. The benchmark is run on a dense matrix of size 1000x1000 and a sparse matrix of size 1000x1000. The benchmark measures the time taken to compute the SVD of the matrix using our implementation and the `Eigen` library. The results show that our implementation is faster than the `Eigen` library for both dense and sparse matrices.
 
-| Benchmark Name                        | Size  | Mean          | Low Mean      | High Mean     |
-|---------------------------------------|-------|---------------|---------------|---------------|
-| GivensRotationQR with sparse matrix   | 100   | 2.14231 ms    | 2.13479 ms    | 2.15039 ms    |
-| GivensRotationQR with sparse matrix   | 200   | 11.9559 ms    | 11.9181 ms    | 11.9883 ms    |
-| GivensRotationQR with sparse matrix   | 300   | 38.4835 ms    | 38.3569 ms    | 38.6319 ms    |
-| GivensRotationQR with sparse matrix   | 400   | 86.3512 ms    | 86.2812 ms    | 86.4386 ms    |
-| GivensRotationQR with sparse matrix   | 500   | 162.965 ms    | 161.811 ms    | 166.101 ms    |
-| GivensRotationQR with sparse matrix   | 600   | 279.566 ms    | 278.516 ms    | 281.161 ms    |
-| GivensRotationQR with sparse matrix   | 700   | 435.05 ms     | 433.854 ms    | 436.587 ms    |
+The following figure summarizes the results of givens rotation QR for sparse matrices:
+![alt text](figures/householder_givens.jpg)
+This figure shows we should do more to optimize the givens rotation QR for sparse matrices.
+
+The following figure summarizes the results of multiple SVD method for sparse matrices:
+![alt text](figures/plot.jpg)
 
 ## MPI & OMP Example
 ```bash
@@ -240,47 +255,17 @@ mpirun -np 4 ./build/profiling/mpi_omp_random_matrix
 ```
 We have implemented benchmarks to compare the performance to generate random matrix using MPI and OpenMP. The following table summarizes the results:
 
-| Configuration                        | Number of Processes | Time Taken (seconds) |
-|--------------------------------------|---------------------|----------------------|
-| RandomMTX mpi                             | 1                   | 0.954016             |
-| RandomMTX mpi                             | 2                   | 0.686535             |
-| RandomMTX mpi                             | 4                   | 0.594157             |
-| RandomMTX mpi_omp                         | 1                   | 0.998558             |
-| RandomMTX mpi_omp                         | 2                   | 3.01405              |
-| RandomMTX mpi_omp                         | 4                   | 0.635416              |
-| RandomMTX omp                             | 1                   | ***0.0920939***           |
+| Configuration     | Number of Processes | Time Taken (seconds) |
+|-------------------|---------------------|----------------------|
+| RandomMTX mpi     | 1                   | 0.954016             |
+| RandomMTX mpi     | 2                   | 0.686535             |
+| RandomMTX mpi     | 4                   | 0.594157             |
+| RandomMTX mpi_omp | 1                   | 0.998558             |
+| RandomMTX mpi_omp | 2                   | 3.01405              |
+| RandomMTX mpi_omp | 4                   | 0.635416             |
+| RandomMTX omp     | 1                   | ***0.0920939***      |
 
-![alt text](image.png)
+![alt text](figures/image.png)
 ### Analysis
 - Notably, the "RandomMTX omp" configuration with 1 process shows an outstanding performance with a time taken of just 0.0920939 seconds, which is the fastest.
 - Excessive parallelization may lead to a huge amount of creation and destruction of resources, and as a result, the performance may turn out to be worse.
-
-# RandomizedSVD algorithm overview
-Randomized Singular Value Decomposition is a fast probabilistic algorithm that can be used to compute the near optimal low-rank singular value decomposition of massive data sets with high accuracy. The key idea is to compute a compressed representation of the data to capture the essential information. This compressed representation can then be used to obtain the low-rank singular value decomposition decomposition.
-The larger the matrix, the higher the computational advantages of this algorithm are, considering that classical SVD computation requires 𝑂(𝑚𝑛 min(𝑚,𝑛)) operations. It's expecially efficient when the matrix is sparse or when only a small subset of singular values and vectors is needed.
-
-The steps of the algorithm are:
-1. Generate a projection S of the input matrix A on a random subspace, defined by a random Gaussian matrix, to reduce its column space dimensionality (rank) and capture its dominant structure;
-2. Orthogonalize S by using QR decomposition;
-3. Project A onto the subspace defined by Q to reduce the size of A. Call this projection B;
-4. Compute a more efficient SVD on the smaller matrix B;
-5. Recover the approximate SVD of A.
-
-rSVD reaches a complexity of O(m*n*k)+O(k^2 *n)+O(k^3), where 
-𝑘 is the reduced rank of A. This is faster than classical SVD if k<< min(m,n).
-
-# RandomizedSVD.h code explanation
-The Randomized Singular Value Decomposition is an algorithm for efficient approximation of the SVD of large matrices. It is particularly effective when the desired decomposition rank is smaller than the input matrix dimensions. 
-It is written using the Eigen namespace. 
-The RandomizedSVD template class has two parameters:
-  - The type of the input matrix
-  - The decomposition options
-It uses the default constructor.
-It has 4 public methods:
- - compute(): contains the rSVD algorithm
- - singularValue(): returns the vector of singular values
- - matrixU(): returns the left singular vectors
- - matrixV(): returns the right singular vectors
-Then there are 2 private methods:
- - generateRandomMatrix(): generates a 2D random matrix with random Gaussian values      given the matrix dimensions.
- - randomProjection(): this methods is the core of the rSVD decomposition. It generates a random Gaussian matrix and multiplies the input matrix by it, creating a "sketch" matrix. Then it performs the number of Power Iteraions requested on the sketc to refine it. Using the HouseholderQR function, it computer the QR decomposition of the sketch. Finally, it projects the original matrix onto the low-dimensional subspace and performs the SVD on it using the JacobiSVD function.

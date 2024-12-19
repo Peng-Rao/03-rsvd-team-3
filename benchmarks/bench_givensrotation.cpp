@@ -1,4 +1,4 @@
-#include "GivensRotationQR.h" // Assuming a custom implementation of GivensRotationQR
+#include "GivensRotationQR.h"
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -64,12 +64,13 @@ TEST_CASE("Eigen GivensRotationQR Decomposition Benchmark", "[GivensRotation_ben
     for (size_t idx = 0; idx < denseMatrices.size(); ++idx) {
         const int size = startSize + static_cast<int>(idx) * stepSize;
         denseMatrices[idx];
+        auto dense = denseMatrices[idx];
         auto& sparse = sparseMatrices[idx];
 
         // Benchmark for sparse matrices
         BENCHMARK("GivensRotationQR with sparse matrix size " + std::to_string(size)) {
-            Eigen::GivensRotationQR<Eigen::SparseMatrix<double>> givens_rotation_qr;
-            givens_rotation_qr.compute(sparse);
+            Eigen::GivensRotationQR<Eigen::MatrixXd> givens_rotation_qr;
+            givens_rotation_qr.compute(dense);
         };
     }
 }
@@ -79,8 +80,8 @@ int main(int argc, char* argv[]) {
     Catch::Session session;
 
     // Add XML reporter option to command-line arguments
-    // const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "givens_rotation.xml"};
-    const char* xmlReporterArgs[] = {"--reporter", "console"};
+    const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "givens_rotation.xml"};
+    // const char* xmlReporterArgs[] = {"--reporter", "console"};
     int xmlReporterArgc = sizeof(xmlReporterArgs) / sizeof(char*);
 
     // Combine user-provided args and XML reporter args

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="BenchHouseholder" rng-seed="1352304823" xml-format-version="3" catch2-version="3.7.1">
+  <TestCase name="Eigen Householder Decomposition Benchmark" tags="[householder_bench_dynamic]" filename="/Users/raopend/Workspace/03-rsvd-team-3/benchmarks/bench_householder.cpp" line="61">
+    <BenchmarkResults name="HouseholderQR with dense matrix size 100" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="1.30535e+07">
+      <!-- All values in nano seconds -->
+      <mean value="130942" lowerBound="130400" upperBound="132045" ci="0.95"/>
+      <standardDeviation value="3788.1" lowerBound="2223.68" upperBound="6813.53" ci="0.95"/>
+      <outliers variance="0.238331" lowMild="0" lowSevere="0" highMild="9" highSevere="8"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 200" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="5.92244e+07">
+      <!-- All values in nano seconds -->
+      <mean value="590329" lowerBound="587355" upperBound="595374" ci="0.95"/>
+      <standardDeviation value="19422" lowerBound="12886.2" upperBound="28812" ci="0.95"/>
+      <outliers variance="0.287008" lowMild="0" lowSevere="0" highMild="9" highSevere="7"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 300" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="1.59067e+08">
+      <!-- All values in nano seconds -->
+      <mean value="1.59698e+06" lowerBound="1.59011e+06" upperBound="1.60639e+06" ci="0.95"/>
+      <standardDeviation value="40875" lowerBound="31814.8" upperBound="53278.9" ci="0.95"/>
+      <outliers variance="0.19046" lowMild="0" lowSevere="0" highMild="7" highSevere="4"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 400" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="3.43649e+08">
+      <!-- All values in nano seconds -->
+      <mean value="3.45162e+06" lowerBound="3.43806e+06" upperBound="3.46901e+06" ci="0.95"/>
+      <standardDeviation value="77975.2" lowerBound="62809.4" upperBound="102599" ci="0.95"/>
+      <outliers variance="0.161152" lowMild="0" lowSevere="0" highMild="5" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 500" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="6.60116e+08">
+      <!-- All values in nano seconds -->
+      <mean value="6.54554e+06" lowerBound="6.52121e+06" upperBound="6.57583e+06" ci="0.95"/>
+      <standardDeviation value="138712" lowerBound="115698" upperBound="167703" ci="0.95"/>
+      <outliers variance="0.142172" lowMild="0" lowSevere="0" highMild="6" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 600" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="1.07871e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.08544e+07" lowerBound="1.08033e+07" upperBound="1.09134e+07" ci="0.95"/>
+      <standardDeviation value="279650" lowerBound="245133" upperBound="325678" ci="0.95"/>
+      <outliers variance="0.199619" lowMild="0" lowSevere="0" highMild="3" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 700" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="1.66e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.66939e+07" lowerBound="1.66292e+07" upperBound="1.67662e+07" ci="0.95"/>
+      <standardDeviation value="347875" lowerBound="308845" upperBound="398273" ci="0.95"/>
+      <outliers variance="0.141904" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 800" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="2.43023e+09">
+      <!-- All values in nano seconds -->
+      <mean value="2.42767e+07" lowerBound="2.42165e+07" upperBound="2.4341e+07" ci="0.95"/>
+      <standardDeviation value="315525" lowerBound="283561" upperBound="357897" ci="0.95"/>
+      <outliers variance="0.0566701" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 900" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="3.37814e+09">
+      <!-- All values in nano seconds -->
+      <mean value="3.36746e+07" lowerBound="3.35803e+07" upperBound="3.37924e+07" ci="0.95"/>
+      <standardDeviation value="534164" lowerBound="440124" upperBound="676477" ci="0.95"/>
+      <outliers variance="0.0849701" lowMild="0" lowSevere="0" highMild="9" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="HouseholderQR with dense matrix size 1000" samples="100" resamples="100000" iterations="1" clockResolution="17.0973" estimatedDuration="4.6246e+09">
+      <!-- All values in nano seconds -->
+      <mean value="4.58916e+07" lowerBound="4.57349e+07" upperBound="4.60756e+07" ci="0.95"/>
+      <standardDeviation value="869767" lowerBound="751098" upperBound="1.01378e+06" ci="0.95"/>
+      <outliers variance="0.113736" lowMild="0" lowSevere="0" highMild="4" highSevere="0"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>
