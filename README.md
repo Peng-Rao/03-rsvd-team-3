@@ -18,7 +18,7 @@ This project is a C++ implementation of the **Randomized Singular Value Decompos
 
 ## Programming Paradigm
 Our project leverages template programming to provide flexible and efficient implementations of key linear algebra algorithms. Specifically, the classes `GivensRotationQR`, `PowerMethodSVD`, and `RandomizedSVD` are designed to accommodate a wide range of data types and storage formats. These classes support both dense and sparse matrices. For example:
-```
+```cpp
 // Dense matrix
 Eigen::RandomizedSVD<double, Eigen::Dynamic, Eigen::Dynamic> rsvd;
 
