@@ -1,10 +1,9 @@
 #include "GivensRotationQR.h"
 
 #include <Eigen/Sparse>
-#include <Eigen/Dense>
 #include <catch2/catch_test_macros.hpp>
-#include <random>
 #include <iostream>
+#include <random>
 
 using Eigen::SparseMatrix;
 using Eigen::MatrixXd;
@@ -12,14 +11,14 @@ using Eigen::MatrixXd;
 TEST_CASE("Givens Rotation on Sparse Random Matrices with Error Reporting", "[rsvd_sparse_random_error]") {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(-100.0, 100.0);
+    std::uniform_real_distribution dis(-100.0, 100.0);
 
-    for (int size = 200; size <= 1000; size *= 10) {
+    for (int size = 100; size <= 1000; size *= 2) {
         // Define sparsity (percentage of non-zero elements)
         constexpr double sparsity = 0.01; // 1% non-zero entries
 
         // Generate sparse random matrix
-        SparseMatrix<double, Eigen::RowMajor> A(size, size);
+        SparseMatrix<double> A(size, size);
         std::vector<Eigen::Triplet<double>> triplets;
         const int nonZeroEntries = static_cast<int>(size * size * sparsity);
 
@@ -35,7 +34,7 @@ TEST_CASE("Givens Rotation on Sparse Random Matrices with Error Reporting", "[rs
         // auto A_dense = MatrixXd(A);
 
         // Perform GivensRotationQR decomposition
-        Eigen::GivensRotationQR<SparseMatrix<double, Eigen::RowMajor>> qr;
+        Eigen::GivensRotationQR<SparseMatrix<double>> qr;
         qr.compute(A);
 
         // Get Q and R matrices

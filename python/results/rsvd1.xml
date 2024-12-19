@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="BenchRandomizedSVD" rng-seed="1682744203" xml-format-version="3" catch2-version="3.7.1">
+  <TestCase name="Eigen RandomizedSVD Benchmark" tags="[randomizedSVD_bench_dynamic]" filename="/Users/raopend/Workspace/03-rsvd-team-3/benchmarks/bench_randomizedSVD.cpp" line="48">
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 100" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="4.62419e+07">
+      <!-- All values in nano seconds -->
+      <mean value="512581" lowerBound="505098" upperBound="521124" ci="0.95"/>
+      <standardDeviation value="40611.9" lowerBound="35128.9" upperBound="48314.3" ci="0.95"/>
+      <outliers variance="0.707097" lowMild="0" lowSevere="0" highMild="3" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 200" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="1.34727e+08">
+      <!-- All values in nano seconds -->
+      <mean value="1.35724e+06" lowerBound="1.33641e+06" upperBound="1.38079e+06" ci="0.95"/>
+      <standardDeviation value="113085" lowerBound="98765.5" upperBound="131199" ci="0.95"/>
+      <outliers variance="0.727675" lowMild="0" lowSevere="0" highMild="2" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 300" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="2.90323e+08">
+      <!-- All values in nano seconds -->
+      <mean value="2.75775e+06" lowerBound="2.72948e+06" upperBound="2.79384e+06" ci="0.95"/>
+      <standardDeviation value="161498" lowerBound="129825" upperBound="236597" ci="0.95"/>
+      <outliers variance="0.564673" lowMild="0" lowSevere="0" highMild="3" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 400" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="4.39211e+08">
+      <!-- All values in nano seconds -->
+      <mean value="4.76049e+06" lowerBound="4.44242e+06" upperBound="6.27361e+06" ci="0.95"/>
+      <standardDeviation value="3.03059e+06" lowerBound="211981" upperBound="7.21317e+06" ci="0.95"/>
+      <outliers variance="0.989622" lowMild="0" lowSevere="0" highMild="1" highSevere="3"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 500" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="6.86501e+08">
+      <!-- All values in nano seconds -->
+      <mean value="6.82403e+06" lowerBound="6.77114e+06" upperBound="6.8861e+06" ci="0.95"/>
+      <standardDeviation value="292383" lowerBound="247045" upperBound="370176" ci="0.95"/>
+      <outliers variance="0.404986" lowMild="0" lowSevere="0" highMild="3" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 600" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="9.47669e+08">
+      <!-- All values in nano seconds -->
+      <mean value="8.99563e+06" lowerBound="8.9461e+06" upperBound="9.0592e+06" ci="0.95"/>
+      <standardDeviation value="283797" lowerBound="232796" upperBound="380264" ci="0.95"/>
+      <outliers variance="0.267692" lowMild="0" lowSevere="0" highMild="4" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 700" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="1.1659e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.16187e+07" lowerBound="1.15806e+07" upperBound="1.16608e+07" ci="0.95"/>
+      <standardDeviation value="204406" lowerBound="177535" upperBound="251014" ci="0.95"/>
+      <outliers variance="0.103891" lowMild="0" lowSevere="0" highMild="2" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 800" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="1.51575e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.56912e+07" lowerBound="1.55581e+07" upperBound="1.58975e+07" ci="0.95"/>
+      <standardDeviation value="836148" lowerBound="584744" upperBound="1.24183e+06" ci="0.95"/>
+      <outliers variance="0.514543" lowMild="0" lowSevere="0" highMild="3" highSevere="3"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 900" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="2.02288e+09">
+      <!-- All values in nano seconds -->
+      <mean value="2.04339e+07" lowerBound="2.01865e+07" upperBound="2.08362e+07" ci="0.95"/>
+      <standardDeviation value="1.58388e+06" lowerBound="1.06649e+06" upperBound="2.51572e+06" ci="0.95"/>
+      <outliers variance="0.69689" lowMild="0" lowSevere="0" highMild="2" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="RandomizedSVD with sparse matrix size 1000" samples="100" resamples="100000" iterations="1" clockResolution="17.232" estimatedDuration="2.53578e+09">
+      <!-- All values in nano seconds -->
+      <mean value="2.58344e+07" lowerBound="2.55484e+07" upperBound="2.6142e+07" ci="0.95"/>
+      <standardDeviation value="1.50685e+06" lowerBound="1.31793e+06" upperBound="1.72603e+06" ci="0.95"/>
+      <outliers variance="0.555078" lowMild="0" lowSevere="0" highMild="2" highSevere="0"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>

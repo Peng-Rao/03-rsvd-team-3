@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="BenchGivensRotation" rng-seed="2717619986" xml-format-version="3" catch2-version="3.7.1">
+  <TestCase name="Eigen GivensRotationQR Decomposition Benchmark" tags="[GivensRotation_bench_dynamic]" filename="/Users/raopend/Workspace/03-rsvd-team-3/benchmarks/bench_givensrotation.cpp" line="63">
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 100" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="2.13671e+08">
+      <!-- All values in nano seconds -->
+      <mean value="2.10256e+06" lowerBound="2.09113e+06" upperBound="2.11356e+06" ci="0.95"/>
+      <standardDeviation value="57190.6" lowerBound="53454.5" upperBound="62028" ci="0.95"/>
+      <outliers variance="0.218828" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 200" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="1.1642e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.16948e+07" lowerBound="1.16557e+07" upperBound="1.17365e+07" ci="0.95"/>
+      <standardDeviation value="206118" lowerBound="189064" upperBound="224196" ci="0.95"/>
+      <outliers variance="0.103914" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 300" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="3.83537e+09">
+      <!-- All values in nano seconds -->
+      <mean value="3.75006e+07" lowerBound="3.74216e+07" upperBound="3.75927e+07" ci="0.95"/>
+      <standardDeviation value="432115" lowerBound="359209" upperBound="544245" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="0" lowSevere="0" highMild="2" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 400" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="8.49697e+09">
+      <!-- All values in nano seconds -->
+      <mean value="8.4889e+07" lowerBound="8.48021e+07" upperBound="8.49742e+07" ci="0.95"/>
+      <standardDeviation value="439456" lowerBound="386219" upperBound="506004" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="1" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 500" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="1.59829e+10">
+      <!-- All values in nano seconds -->
+      <mean value="1.60033e+08" lowerBound="1.59912e+08" upperBound="1.60208e+08" ci="0.95"/>
+      <standardDeviation value="733561" lowerBound="563038" upperBound="1.12888e+06" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="0" lowSevere="0" highMild="3" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 600" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="2.72743e+10">
+      <!-- All values in nano seconds -->
+      <mean value="2.76447e+08" lowerBound="2.75095e+08" upperBound="2.79083e+08" ci="0.95"/>
+      <standardDeviation value="9.2449e+06" lowerBound="5.69614e+06" upperBound="1.68125e+07" ci="0.95"/>
+      <outliers variance="0.296574" lowMild="0" lowSevere="0" highMild="4" highSevere="12"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 700" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="4.4181e+10">
+      <!-- All values in nano seconds -->
+      <mean value="4.51814e+08" lowerBound="4.4891e+08" upperBound="4.55846e+08" ci="0.95"/>
+      <standardDeviation value="1.72452e+07" lowerBound="1.31543e+07" upperBound="2.38012e+07" ci="0.95"/>
+      <outliers variance="0.3461" lowMild="0" lowSevere="0" highMild="4" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 800" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="1.23349e+11">
+      <!-- All values in nano seconds -->
+      <mean value="1.18136e+09" lowerBound="1.1694e+09" upperBound="1.19365e+09" ci="0.95"/>
+      <standardDeviation value="6.16907e+07" lowerBound="5.63124e+07" upperBound="7.00207e+07" ci="0.95"/>
+      <outliers variance="0.504506" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 900" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="1.01527e+11">
+      <!-- All values in nano seconds -->
+      <mean value="9.84602e+08" lowerBound="9.75824e+08" upperBound="1.00412e+09" ci="0.95"/>
+      <standardDeviation value="6.35749e+07" lowerBound="3.591e+07" upperBound="1.26861e+08" ci="0.95"/>
+      <outliers variance="0.605594" lowMild="0" lowSevere="0" highMild="2" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="GivensRotationQR with sparse matrix size 1000" samples="100" resamples="100000" iterations="1" clockResolution="16.5921" estimatedDuration="1.30828e+11">
+      <!-- All values in nano seconds -->
+      <mean value="1.40971e+09" lowerBound="1.40068e+09" upperBound="1.41878e+09" ci="0.95"/>
+      <standardDeviation value="4.62102e+07" lowerBound="4.08424e+07" upperBound="5.36834e+07" ci="0.95"/>
+      <outliers variance="0.286913" lowMild="0" lowSevere="0" highMild="1" highSevere="0"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>

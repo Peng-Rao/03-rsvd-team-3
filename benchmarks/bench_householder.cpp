@@ -66,13 +66,13 @@ TEST_CASE("Eigen Householder Decomposition Benchmark", "[householder_bench_dynam
 
         BENCHMARK("HouseholderQR with dense matrix size " + std::to_string(size)) {
             Eigen::HouseholderQR<Eigen::MatrixXd> householderQR;
-            householderQR.compute(dense);
+            householderQR.compute(sparse);
         };
-
-        BENCHMARK("SparseQR with sparse matrix size " + std::to_string(size)) {
-            Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> sparseQR;
-            sparseQR.compute(sparse);
-        };
+        //
+        // BENCHMARK("SparseQR with sparse matrix size " + std::to_string(size)) {
+        //     Eigen::SparseQR<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int>> sparseQR;
+        //     sparseQR.compute(sparse);
+        // };
     }
 }
 

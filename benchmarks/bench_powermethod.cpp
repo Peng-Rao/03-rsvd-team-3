@@ -46,26 +46,12 @@ constexpr double sparsity = 0.1;
 // Generate matrices once to avoid recreating in each test case
 std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> sparseMatrices = generateSparseMatrices(startSize, endSize, stepSize, sparsity);
 
-// Randomized SVD Benchmark Test
-TEST_CASE("Eigen RandomizedSVD Benchmark", "[randomizedSVD_bench_dynamic]") {
-    for (int idx = 0; idx < sparseMatrices.size(); ++idx) {
-        const int size = startSize + idx * stepSize;
-        const auto& sparse = sparseMatrices[idx];
-        int rank = 10;
-
-        BENCHMARK("RandomizedSVD with sparse matrix size " + std::to_string(size)) {
-            Eigen::RandomizedSVD<Eigen::SparseMatrix<double, Eigen::RowMajor>> rsvd;
-            rsvd.compute(sparse, rank, 5);
-        };
-    }
-}
-
 // Power Method SVD Benchmark Test
 TEST_CASE("Eigen PowerMethod Benchmark", "[powermethod_bench_dynamic]") {
     for (int idx = 0; idx < sparseMatrices.size(); ++idx) {
         const int size = startSize + idx * stepSize;
         const auto& sparse = sparseMatrices[idx];
-        int rank = 1;
+        int rank = 10;
 
         BENCHMARK("PowerMethodSVD with sparse matrix size " + std::to_string(size)) {
             Eigen::PowerMethodSVD<Eigen::SparseMatrix<double, Eigen::RowMajor>> pmethod;
