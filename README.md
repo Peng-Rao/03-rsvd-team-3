@@ -244,6 +244,7 @@ We have implemented a benchmark to compare the performance of our implementation
 
 The following figure summarizes the results of givens rotation QR for sparse matrices:
 ![alt text](figures/householder_givens.jpg)
+This figure shows we should do more to optimize the givens rotation QR for sparse matrices.
 
 The following figure summarizes the results of multiple SVD method for sparse matrices:
 ![alt text](figures/plot.jpg)
@@ -268,5 +269,3 @@ We have implemented benchmarks to compare the performance to generate random mat
 ### Analysis
 - Notably, the "RandomMTX omp" configuration with 1 process shows an outstanding performance with a time taken of just 0.0920939 seconds, which is the fastest.
 - Excessive parallelization may lead to a huge amount of creation and destruction of resources, and as a result, the performance may turn out to be worse.
-
-These results suggest that MPI parallelization is most effective for computationally intensive operations like QR decomposition, while simpler operations like random matrix generation may not benefit from parallelization due to communication overhead.
