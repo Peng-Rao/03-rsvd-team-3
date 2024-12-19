@@ -269,16 +269,4 @@ We have implemented benchmarks to compare the performance to generate random mat
 - Notably, the "RandomMTX omp" configuration with 1 process shows an outstanding performance with a time taken of just 0.0920939 seconds, which is the fastest.
 - Excessive parallelization may lead to a huge amount of creation and destruction of resources, and as a result, the performance may turn out to be worse.
 
-### Analysis
-1. Random Matrix Generation:
-   - The parallel implementation showed no significant speedup
-   - Communication overhead likely dominates the computation time
-   - Best performance achieved with single process
-
-2. Givens Rotation QR:
-   - Shows near-linear speedup up to 4 processes
-   - Continues to improve with 8 processes
-   - Demonstrates good parallel efficiency
-   - Communication overhead is well-balanced with computational work
-
 These results suggest that MPI parallelization is most effective for computationally intensive operations like QR decomposition, while simpler operations like random matrix generation may not benefit from parallelization due to communication overhead.
