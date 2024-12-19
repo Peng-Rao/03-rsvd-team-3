@@ -1,12 +1,13 @@
 #include "GivensRotationQR.h"
-
 #include <vector>
 #include <random>
-
+#include <mpi.h>
+#include <chrono>
+#include <iostream>
 
 int main() {
     // Define matrix size and sparsity
-    constexpr int matrixSize = 2000;
+    constexpr int matrixSize = 1000;
     constexpr double sparsity = 0.1; // Fraction of non-zero elements
 
     // Random number generator for matrix elements
@@ -30,7 +31,27 @@ int main() {
 
     // Perform Sparse QR Decomposition
     Eigen::GivensRotationQR<Eigen::SparseMatrix<double>> givens_rotation_qr;
+    // Eigen::setNbThreads(4);
+    auto start_time = std::chrono::high_resolution_clock::now();
     givens_rotation_qr.compute(sparseMatrix);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "QR decomposition time: " << duration.count() << " ms" << std::endl;
 
+    Eigen::MatrixXd Q = givens_rotation_qr.matrixQ();
+    Eigen::MatrixXd R = givens_rotation_qr.matrixR();
+    Eigen::MatrixXd QR = Q * R;
+
+    double frobenius_norm = (sparseMatrix - QR).norm();
+    std::cout << "Frobenius err norm: " << frobenius_norm << std::endl;
     return 0;
 }
+
+
+
+
+
+
+
+
+
