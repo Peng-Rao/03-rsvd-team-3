@@ -8,6 +8,7 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <omp.h>
 
 #include <random>
 
@@ -74,6 +75,7 @@ namespace Eigen {
             std::normal_distribution<Scalar> dist(0.0, 1.0);
 
             DenseMatrix mat(rows, cols);
+            #pragma omp parallel for collapse(2)
             for (Index i = 0; i < rows; ++i) {
                 for (Index j = 0; j < cols; ++j) {
                     mat(i, j) = dist(gen);

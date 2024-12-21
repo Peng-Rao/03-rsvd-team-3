@@ -13,6 +13,7 @@
 #include <random>
 #include <mpi.h>
 #include <iostream>
+#include <omp.h>
 namespace Eigen {
 
     /**
@@ -90,6 +91,8 @@ namespace Eigen {
             std::normal_distribution<Scalar> dist(0.0, 1.0);
 
             DenseMatrix local_mat(local_rows, cols);
+
+            #pragma omp parallel for collapse(2)
             for (Index i = 0; i < local_rows; ++i) {
                 for (Index j = 0; j < cols; ++j) {
                     local_mat(i, j) = dist(gen);
@@ -100,7 +103,6 @@ namespace Eigen {
             MPI_Gather(local_mat.data(), local_rows * cols, MPI_DOUBLE,
                     global_mat.data(), local_rows * cols, MPI_DOUBLE,
                     0, MPI_COMM_WORLD);
-
 
             return global_mat;
         }

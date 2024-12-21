@@ -7,11 +7,14 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+#include <omp.h>
+
 namespace Eigen {
     /**
      * @brief Base class template (default for dense matrices)
      */
     template<typename MatrixType, bool IsSparse = is_sparse_matrix<MatrixType>::value>
+    // template<typename MatrixType>
     class GivensRotationQR {
     public:
         using Scalar = typename MatrixType::Scalar;
@@ -23,6 +26,12 @@ namespace Eigen {
 
         GivensRotationQR() = default;
 
+        /**
+         * @brief Compute the QR decomposition using Given rotations
+         *
+         * @param matrix The input matrix to decompose
+         * @return Reference to this object
+         */
         GivensRotationQR& compute(const MatrixType& matrix) {
             Index rows = matrix.rows();
             Index cols = matrix.cols();
@@ -44,10 +53,27 @@ namespace Eigen {
             return *this;
         }
 
+        /**
+         * @brief Access the orthogonal matrix Q
+         * @return The Q matrix
+         */
         const DenseMatrix& matrixQ() const { return m_matrixQ; }
+
+        /**
+         * @brief Access the upper triangular matrix R
+         * @return The R matrix
+         */
         const DenseMatrix& matrixR() const { return m_matrixR; }
 
     private:
+        /**
+         * @brief Compute the Given rotation coefficients
+         *
+         * @param a First value
+         * @param b Second value
+         * @param c Output cosine
+         * @param s Output sine
+         */
         void computeGivensRotation(Scalar a, Scalar b, Scalar& c, Scalar& s) {
             if (b == Scalar(0)) {
                 c = Scalar(1);
@@ -58,14 +84,33 @@ namespace Eigen {
                 s = -b / r;
             }
         }
-
+        /**
+         * @brief Apply a Given rotation to a matrix
+         *
+         * @param matrix The matrix to apply the rotation to
+         * @param i Row index 1
+         * @param k Row index 2
+         * @param c Cosine of the rotation
+         * @param s Sine of the rotation
+         * @param isQ If true, apply the transpose for Q
+         */
         void applyGivensRotation(DenseMatrix& matrix, Index i, Index k, Scalar c, Scalar s, bool isQ = false) {
             if (isQ) {
+                /*
+                 * Apply the rotation to the columns of the matrix
+                 * Q = I * G_1^T * G_2^T * ... * G_n^T
+                 * Instead of computing the transpose of the rotation matrix, we apply the rotation to the columns
+                 * QT = G_1 * G_2 * ... * G_n * I
+                 */
                 auto temp_i = matrix.col(i).eval();
                 auto temp_k = matrix.col(k).eval();
                 matrix.col(i) = c * temp_i - s * temp_k;
                 matrix.col(k) = s * temp_i + c * temp_k;
             } else {
+                /*
+                 * Apply the rotation to the rows of the matrix
+                 * R = G_n * ... * G_2 * G_1 * A
+                 */
                 auto temp_i = matrix.row(i).eval();
                 auto temp_k = matrix.row(k).eval();
                 matrix.row(i) = c * temp_i - s * temp_k;
@@ -77,9 +122,9 @@ namespace Eigen {
         DenseMatrix m_matrixR;
     };
 
-    /**
-     * @brief sparse matrices
-     */
+    // /**
+    //  * @brief sparse matrices
+    //  */
     template<typename MatrixType>
     class GivensRotationQR<MatrixType, true> {
     public:

@@ -1,38 +1,57 @@
 #include "GivensRotationQR.h"
-
-#include <Eigen/Core>
+#include <vector>
+#include <random>
+#include <mpi.h>
+#include <chrono>
 #include <iostream>
 
-
 int main() {
-    // Eigen::Matrix<double, 3, 3> A;
-    // A << 12, -51,   4,
-    //       6, 167, -68,
-    //      -4,  24, -41;
+    // Define matrix size and sparsity
+    constexpr int matrixSize = 1000;
+    constexpr double sparsity = 0.1; // Fraction of non-zero elements
 
-    // Define SparseMatrix RowMajor
-    Eigen::SparseMatrix<double, Eigen::RowMajor> A(3, 3);
-    A.insert(0, 0) = 12;
-    A.insert(0, 1) = -51;
-    A.insert(0, 2) = 4;
-    A.insert(1, 0) = 6;
-    A.insert(1, 1) = 167;
-    A.insert(1, 2) = -68;
-    A.insert(2, 0) = -4;
-    A.insert(2, 1) = 24;
-    A.insert(2, 2) = -41;
-    std::cout << "Q:\n" << A << "\n\n";
-    A.makeCompressed();
-    Eigen::GivensRotationQR<Eigen::SparseMatrix<double, Eigen::RowMajor>> qr;
-    // Eigen::GivensRotationQR<Eigen::MatrixXd> qr;
-    qr.compute(A);
+    // Random number generator for matrix elements
+    std::mt19937 gen(42); // Fixed seed for reproducibility
+    std::uniform_real_distribution valueDist(-1.0, 1.0); // Values for matrix elements
+    std::uniform_real_distribution sparsityDist(0.0, 1.0); // To determine sparsity
 
-    Eigen::MatrixXd Q = qr.matrixQ();
-    Eigen::MatrixXd R = qr.matrixR();
+    // Generate a random sparse matrix
+    Eigen::SparseMatrix<double> sparseMatrix(matrixSize, matrixSize);
+    std::vector<Eigen::Triplet<double>> triplets;
 
-    std::cout << "Q:\n" << Q << "\n\n";
-    std::cout << "R:\n" << R << "\n\n";
-    std::cout << "Reconstructed A (Q*R):\n" << Q * R << "\n\n";
+    for (int i = 0; i < matrixSize; ++i) {
+        for (int j = 0; j < matrixSize; ++j) {
+            if (sparsityDist(gen) < sparsity) {
+                triplets.emplace_back(i, j, valueDist(gen));
+            }
+        }
+    }
 
+    sparseMatrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    // Perform Sparse QR Decomposition
+    Eigen::GivensRotationQR<Eigen::SparseMatrix<double>> givens_rotation_qr;
+    // Eigen::setNbThreads(4);
+    auto start_time = std::chrono::high_resolution_clock::now();
+    givens_rotation_qr.compute(sparseMatrix);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "QR decomposition time: " << duration.count() << " ms" << std::endl;
+
+    Eigen::MatrixXd Q = givens_rotation_qr.matrixQ();
+    Eigen::MatrixXd R = givens_rotation_qr.matrixR();
+    Eigen::MatrixXd QR = Q * R;
+
+    double frobenius_norm = (sparseMatrix - QR).norm();
+    std::cout << "Frobenius err norm: " << frobenius_norm << std::endl;
     return 0;
 }
+
+
+
+
+
+
+
+
+

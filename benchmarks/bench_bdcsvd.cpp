@@ -1,9 +1,8 @@
 #include <Eigen/sparse>
+#include <Eigen/Dense>
 #include <catch2/catch_session.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/benchmark/catch_benchmark.hpp>
-
-#include "RandomizedSVD.h"
 
 #include <vector>
 #include <string>
@@ -45,15 +44,16 @@ constexpr double sparsity = 0.1;
 // Generate matrices once to avoid recreating in each test case
 std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> sparseMatrices = generateSparseMatrices(startSize, endSize, stepSize, sparsity);
 
-TEST_CASE("Eigen RandomizedSVD Benchmark", "[randomizedSVD_bench_dynamic]") {
+// Power Method SVD Benchmark Test
+TEST_CASE("Eigen BDCSVD Benchmark", "[bdcsvd_bench_dynamic]") {
     for (int idx = 0; idx < sparseMatrices.size(); ++idx) {
         const int size = startSize + idx * stepSize;
         const auto& sparse = sparseMatrices[idx];
         int rank = 10;
 
-        BENCHMARK("RandomizedSVD with sparse matrix size " + std::to_string(size)) {
-            Eigen::RandomizedSVD<Eigen::SparseMatrix<double, Eigen::RowMajor>> rsvd;
-            rsvd.compute(sparse, rank, 5);
+        BENCHMARK("BDCSVD with sparse matrix size " + std::to_string(size)) {
+            Eigen::BDCSVD<Eigen::MatrixXd> bdcsvd;
+            bdcsvd.compute(sparse, Eigen::ComputeThinU | Eigen::ComputeThinV);
         };
     }
 }
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     Catch::Session session;
 
     // Add XML reporter option to command-line arguments
-    const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "rsvd.xml"};
+    const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "bdcsvd.xml"};
     int xmlReporterArgc = sizeof(xmlReporterArgs) / sizeof(char*);
 
     // Combine user-provided args and XML reporter args

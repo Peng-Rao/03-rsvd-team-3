@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="BenchPowerMethod" rng-seed="3535138711" xml-format-version="3" catch2-version="3.7.1">
+  <TestCase name="Eigen PowerMethod Benchmark" tags="[powermethod_bench_dynamic]" filename="/Users/raopend/Workspace/03-rsvd-team-3/benchmarks/bench_powermethod.cpp" line="50">
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 100" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="3.27157e+09">
+      <!-- All values in nano seconds -->
+      <mean value="3.20365e+07" lowerBound="3.09182e+07" upperBound="3.27154e+07" ci="0.95"/>
+      <standardDeviation value="4.36103e+06" lowerBound="2.78323e+06" upperBound="6.27106e+06" ci="0.95"/>
+      <outliers variance="0.883321" lowMild="1" lowSevere="4" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 200" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="1.05354e+10">
+      <!-- All values in nano seconds -->
+      <mean value="1.08061e+08" lowerBound="1.043e+08" upperBound="1.17209e+08" ci="0.95"/>
+      <standardDeviation value="2.78183e+07" lowerBound="7.87954e+06" upperBound="5.05673e+07" ci="0.95"/>
+      <outliers variance="0.967782" lowMild="10" lowSevere="0" highMild="5" highSevere="3"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 300" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="1.2227e+10">
+      <!-- All values in nano seconds -->
+      <mean value="1.72294e+08" lowerBound="1.48474e+08" upperBound="2.07759e+08" ci="0.95"/>
+      <standardDeviation value="1.45457e+08" lowerBound="1.06365e+08" upperBound="1.82803e+08" ci="0.95"/>
+      <outliers variance="0.989785" lowMild="0" lowSevere="0" highMild="3" highSevere="11"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 400" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="3.96564e+10">
+      <!-- All values in nano seconds -->
+      <mean value="4.36724e+08" lowerBound="4.16917e+08" upperBound="4.6343e+08" ci="0.95"/>
+      <standardDeviation value="1.16277e+08" lowerBound="9.11385e+07" upperBound="1.46684e+08" ci="0.95"/>
+      <outliers variance="0.967926" lowMild="0" lowSevere="1" highMild="2" highSevere="13"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 500" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="4.55403e+10">
+      <!-- All values in nano seconds -->
+      <mean value="4.20554e+08" lowerBound="4.15626e+08" upperBound="4.26335e+08" ci="0.95"/>
+      <standardDeviation value="2.69365e+07" lowerBound="2.25934e+07" upperBound="3.46821e+07" ci="0.95"/>
+      <outliers variance="0.605359" lowMild="1" lowSevere="0" highMild="4" highSevere="1"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 600" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="8.44054e+10">
+      <!-- All values in nano seconds -->
+      <mean value="1.17108e+09" lowerBound="1.09755e+09" upperBound="1.24916e+09" ci="0.95"/>
+      <standardDeviation value="3.86372e+08" lowerBound="3.48747e+08" upperBound="4.79081e+08" ci="0.95"/>
+      <outliers variance="0.978621" lowMild="0" lowSevere="0" highMild="0" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 700" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="4.24322e+10">
+      <!-- All values in nano seconds -->
+      <mean value="4.52133e+08" lowerBound="4.41062e+08" upperBound="4.712e+08" ci="0.95"/>
+      <standardDeviation value="7.23092e+07" lowerBound="4.81724e+07" upperBound="1.1131e+08" ci="0.95"/>
+      <outliers variance="0.914829" lowMild="0" lowSevere="0" highMild="8" highSevere="7"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 800" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="5.64011e+10">
+      <!-- All values in nano seconds -->
+      <mean value="5.77198e+08" lowerBound="5.58511e+08" upperBound="6.35514e+08" ci="0.95"/>
+      <standardDeviation value="1.50906e+08" lowerBound="5.60309e+07" upperBound="3.31086e+08" ci="0.95"/>
+      <outliers variance="0.967849" lowMild="0" lowSevere="0" highMild="3" highSevere="5"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 900" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="6.72854e+10">
+      <!-- All values in nano seconds -->
+      <mean value="6.91214e+08" lowerBound="6.73954e+08" upperBound="7.34523e+08" ci="0.95"/>
+      <standardDeviation value="1.23715e+08" lowerBound="1.39961e+07" upperBound="2.27096e+08" ci="0.95"/>
+      <outliers variance="0.925781" lowMild="0" lowSevere="0" highMild="2" highSevere="8"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="PowerMethodSVD with sparse matrix size 1000" samples="100" resamples="100000" iterations="1" clockResolution="16.9478" estimatedDuration="8.12917e+10">
+      <!-- All values in nano seconds -->
+      <mean value="8.11219e+08" lowerBound="8.0658e+08" upperBound="8.18223e+08" ci="0.95"/>
+      <standardDeviation value="2.86772e+07" lowerBound="2.11038e+07" upperBound="4.07843e+07" ci="0.95"/>
+      <outliers variance="0.316384" lowMild="0" lowSevere="0" highMild="4" highSevere="4"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>
