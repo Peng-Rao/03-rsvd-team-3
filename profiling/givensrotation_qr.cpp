@@ -1,7 +1,6 @@
 #include "GivensRotationQR.h"
 #include <vector>
 #include <random>
-#include <mpi.h>
 #include <chrono>
 #include <iostream>
 
