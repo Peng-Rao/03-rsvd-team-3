@@ -1,12 +1,12 @@
-#include "GivensRotationQR.h"
-#include <vector>
-#include <random>
 #include <chrono>
 #include <iostream>
+#include <random>
+#include <vector>
+#include "../../src/GivensRotationQR.h"
 
 int main() {
     // Define matrix size and sparsity
-    constexpr int matrixSize = 1000;
+    constexpr int matrixSize = 5000;
     constexpr double sparsity = 0.1; // Fraction of non-zero elements
 
     // Random number generator for matrix elements
