@@ -1,8 +1,9 @@
+#include "GivensRotationQR.h"
+
 #include <chrono>
 #include <iostream>
 #include <random>
 #include <vector>
-#include "../../src/GivensRotationQR.h"
 
 int main() {
     // Define matrix size and sparsity

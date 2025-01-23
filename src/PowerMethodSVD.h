@@ -15,9 +15,7 @@ namespace Eigen {
 template<typename MatrixType, bool IsSparse = is_sparse_matrix<MatrixType>::value>
 class PowerMethodSVD;
 
-// ==============================
 // Specialization for Dense Matrices
-// ==============================
 template<typename MatrixType>
 class PowerMethodSVD<MatrixType, false> {
 public:

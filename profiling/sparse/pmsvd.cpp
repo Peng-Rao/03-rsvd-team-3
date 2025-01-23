@@ -1,6 +1,6 @@
-#include "../../src/RandomizedSVD.h"
+#include "RandomizedSVD.h"
 
-#include <../../build/vcpkg_installed/arm64-osx/include/eigen3/Eigen/Sparse>
+#include <Eigen/Sparse>
 
 std::vector<Eigen::SparseMatrix<double, Eigen::RowMajor>> generateSparseMatrices(const int startSize, const int endSize,
                                                                                  const int step, const double sparsity) {
