@@ -50,8 +50,8 @@ std::vector<Eigen::SparseMatrix<double>> generateSparseMatrices(const int startS
 }
 
 // Constants for matrix generation
-constexpr int startSize = 100;
-constexpr int endSize = 1000;
+constexpr int startSize = 1000;
+constexpr int endSize = 5000;
 constexpr int stepSize = 100;
 constexpr double sparsity = 0.1;
 
@@ -63,7 +63,6 @@ std::vector<Eigen::SparseMatrix<double>> sparseMatrices = generateSparseMatrices
 TEST_CASE("Eigen GivensRotationQR Decomposition Benchmark", "[GivensRotation_bench_dynamic]") {
     for (size_t idx = 0; idx < denseMatrices.size(); ++idx) {
         const int size = startSize + static_cast<int>(idx) * stepSize;
-        denseMatrices[idx];
         auto& sparse = sparseMatrices[idx];
 
         // Benchmark for sparse matrices
@@ -79,7 +78,7 @@ int main(int argc, char* argv[]) {
     Catch::Session session;
 
     // Add XML reporter option to command-line arguments
-    const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "givens_rotation.xml"};
+    const char* xmlReporterArgs[] = {"--reporter", "xml", "--out", "givens_rotation_sparse.xml"};
     // const char* xmlReporterArgs[] = {"--reporter", "console"};
     int xmlReporterArgc = sizeof(xmlReporterArgs) / sizeof(char*);
 

@@ -13,34 +13,31 @@ namespace Eigen {
  * @brief Base class template (default for dense matrices)
  */
 template<typename MatrixType, bool IsSparse = is_sparse_matrix<MatrixType>::value>
-class PowerMethodSVD;
-
-// Specialization for Dense Matrices
-template<typename MatrixType>
-class PowerMethodSVD<MatrixType, false> {
+class PowerMethodSVD
+{
 public:
-    using Scalar = typename MatrixType::Scalar;
-    using Index = typename MatrixType::Index;
+    using Scalar      = typename MatrixType::Scalar;
+    using Index       = typename MatrixType::Index;
     using DenseMatrix = Matrix<Scalar, Dynamic, Dynamic>;
     using DenseVector = Matrix<Scalar, Dynamic, 1>;
 
     PowerMethodSVD() = default;
 
     /**
-     * @brief Compute the SVD of a dense matrix up to the given rank using power method + deflation
+     * @brief Compute the SVD of a dense matrix up to the given rank using a
+     *        one-at-a-time power method + deflation + re-orthonormalization.
      *
-     * @param matrix The input dense matrix to decompose
-     * @param rank Desired rank of the approximation
+     * @param matrix   The input dense matrix to decompose
+     * @param rank     Desired rank of the approximation
      * @param maxIters Maximum iterations for each singular value extraction
-     * @param tol Tolerance for convergence
-     * @return Reference to this object
+     * @param tol      Tolerance for convergence
      */
     PowerMethodSVD &compute(const MatrixType &matrix,
                             Index rank,
                             Index maxIters = 1000,
-                            Scalar tol = 1e-6) {
-
-        // Make a copy of the matrix since we will deflate it
+                            Scalar tol = Scalar(1e-6))
+    {
+        // Copy the matrix for deflation
         DenseMatrix A = matrix.template cast<Scalar>();
         Index m = A.rows();
         Index n = A.cols();
@@ -50,14 +47,21 @@ public:
         m_matrixU.resize(m, k);
         m_matrixV.resize(n, k);
 
-        for (Index i = 0; i < k; ++i) {
-            // Extract the largest singular value/vector via power method
+        for (Index i = 0; i < k; ++i)
+        {
+            // Extract the largest singular value/vector, re-orthogonalizing
+            // against previously found singular vectors
             Scalar sigma;
             DenseVector u(m), v(n);
-            bool success = extractLargestSingularValue(A, sigma, u, v, maxIters, tol);
 
-            if (!success) {
-                // If we fail to converge, we just break early
+            bool success = extractLargestSingularValue(
+                A, sigma, u, v, maxIters, tol,
+                m_matrixU, m_matrixV, i  // pass in existing columns
+            );
+
+            if (!success)
+            {
+                // If we fail to converge, shrink the storage and break
                 m_singularValues.conservativeResize(i);
                 m_matrixU.conservativeResize(m, i);
                 m_matrixV.conservativeResize(n, i);
@@ -65,11 +69,11 @@ public:
             }
 
             m_singularValues(i) = sigma;
-            m_matrixU.col(i) = u;
-            m_matrixV.col(i) = v;
+            m_matrixU.col(i)    = u;
+            m_matrixV.col(i)    = v;
 
-            // Deflate the matrix
-            A = A - sigma * u * v.transpose();
+            // Deflate the matrix: A <- A - sigma * u * v^T
+            A.noalias() -= sigma * (u * v.transpose());
         }
 
         return *this;
@@ -77,32 +81,35 @@ public:
 
     /**
      * @brief Get the singular values
-     * @return A vector containing the singular values
      */
     const DenseVector &singularValues() const { return m_singularValues; }
 
     /**
      * @brief Get the left singular vectors (U matrix)
-     * @return The U matrix
      */
     const DenseMatrix &matrixU() const { return m_matrixU; }
 
     /**
      * @brief Get the right singular vectors (V matrix)
-     * @return The V matrix
      */
     const DenseMatrix &matrixV() const { return m_matrixV; }
 
 private:
+
     /**
-     * @brief Use power method to find the largest singular value/vector of A (Dense)
+     * @brief Use power method to find the largest singular value/vector of A (Dense),
+     *        re-orthonormalizing the new vectors against previously found ones.
      *
-     * @param A Input dense matrix
-     * @param sigma (output) largest singular value
-     * @param u (output) left singular vector
-     * @param v (output) right singular vector
-     * @param maxIters Maximum iterations
-     * @param tol Convergence tolerance
+     * @param A         Input dense matrix (already deflated up to current i)
+     * @param sigma     (output) largest singular value
+     * @param u         (output) left singular vector
+     * @param v         (output) right singular vector
+     * @param maxIters  Maximum iterations
+     * @param tol       Convergence tolerance
+     * @param Uprev     The U matrix so far (columns = previously found left sing. vectors)
+     * @param Vprev     The V matrix so far (columns = previously found right sing. vectors)
+     * @param numFound  How many singular vectors have been found so far
+     *
      * @return True if converged, false otherwise
      */
     bool extractLargestSingularValue(const DenseMatrix &A,
@@ -110,32 +117,51 @@ private:
                                      DenseVector &u,
                                      DenseVector &v,
                                      Index maxIters,
-                                     Scalar tol) {
+                                     Scalar tol,
+                                     const DenseMatrix &Uprev,
+                                     const DenseMatrix &Vprev,
+                                     Index numFound)
+    {
         Index m = A.rows();
         Index n = A.cols();
 
-        // Initialize v with random values
+        // Initialize v with random values, then orthonormalize it
         v = randomVector(n);
+        reorthonormalizeVector(v, Vprev, numFound);
+        if(v.norm() < tol) return false;
         v.normalize();
 
-        // Temporary vectors
         DenseVector u_new(m), v_new(n);
-        sigma = 0;
 
-        for (Index iter = 0; iter < maxIters; ++iter) {
-            // Compute u = A * v
-            u_new = A * v;
+        sigma = Scalar(0);
+
+        for (Index iter = 0; iter < maxIters; ++iter)
+        {
+            // 1) Compute u_new = A * v
+            u_new.noalias() = A * v;
+
+            //    Re-orthonormalize u_new against previously found columns of Uprev
+            reorthonormalizeVector(u_new, Uprev, numFound);
+
             Scalar u_norm = u_new.norm();
-            if (u_norm < tol) {
-                return false; // A * v is zero vector, no meaningful singular value
+            if (u_norm < tol)
+            {
+                // A*v is nearly zero => no meaningful singular vector
+                return false;
             }
             u_new /= u_norm;
 
-            // Compute v = A^T * u
-            v_new = A.transpose() * u_new;
+            // 2) Compute v_new = A^T * u_new
+            v_new.noalias() = A.transpose() * u_new;
+
+            //    Re-orthonormalize v_new against previously found columns of Vprev
+            reorthonormalizeVector(v_new, Vprev, numFound);
+
             Scalar v_norm = v_new.norm();
-            if (v_norm < tol) {
-                return false; // A^T * u is zero, can't proceed
+            if (v_norm < tol)
+            {
+                // A^T*u_new is nearly zero => can't proceed
+                return false;
             }
             v_new /= v_norm;
 
@@ -144,13 +170,15 @@ private:
             v = v_new;
             u = u_new;
 
-            if (diff < tol) {
+            if (diff < tol)
+            {
                 // Converged
                 break;
             }
 
-            if (iter == maxIters - 1) {
-                // Did not converge
+            if (iter == maxIters - 1)
+            {
+                // Did not converge within maxIters
                 return false;
             }
         }
@@ -160,9 +188,15 @@ private:
         sigma = Av.norm();
 
         // Ensure consistency: we want u = (A * v) / sigma
-        if (sigma > Scalar(0)) {
+        if (sigma > Scalar(0))
+        {
             u = Av / sigma;
-        } else {
+            // Re-orthonormalize one last time
+            reorthonormalizeVector(u, Uprev, numFound);
+            u.normalize();
+        }
+        else
+        {
             return false;
         }
 
@@ -170,17 +204,38 @@ private:
     }
 
     /**
-     * @brief Generate a random vector of length n
+     * @brief Re-orthonormalize 'vec' against the first 'numCols' columns of 'basis'.
+     *
+     * This step is crucial to keep new singular vectors orthogonal to previously found ones
+     * in finite precision.  We do a simple modified Gram-Schmidt loop:
+     *
+     *    vec <- vec - (basis.col(j)^T vec) * basis.col(j)
+     *
+     * for j=0..(numCols-1).
      */
-    DenseVector randomVector(Index n) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
+    void reorthonormalizeVector(DenseVector &vec,
+                                const DenseMatrix &basis,
+                                Index numCols) const
+    {
+        for (Index j = 0; j < numCols; ++j)
+        {
+            Scalar proj = basis.col(j).dot(vec);
+            vec -= proj * basis.col(j);
+        }
+    }
+
+    /**
+     * @brief Generate a random vector of length n using normal distribution
+     */
+    DenseVector randomVector(Index n) const
+    {
+        static std::random_device rd;
+        static std::mt19937 gen(rd());
         std::normal_distribution<Scalar> dist(0.0, 1.0);
 
         DenseVector vec(n);
-        for (Index i = 0; i < n; ++i) {
+        for (Index i = 0; i < n; ++i)
             vec(i) = dist(gen);
-        }
         return vec;
     }
 

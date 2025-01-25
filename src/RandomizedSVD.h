@@ -89,33 +89,49 @@ namespace Eigen {
          * @param rank Desired rank of the approximation
          * @param powerIterations Number of power iterations
          */
-        void randomProjection(const MatrixType &matrix, Index rank, Index powerIterations) {
-            // Step 1: Generate a random Gaussian matrix
-            DenseMatrix randomMatrix = generateRandomMatrix(matrix.cols(), rank);
+        void randomProjection(const MatrixType &matrix, Index k, Index powerIterations) {
+            // 1) Oversampling parameter
+            // Typically p = 5-20 for better stability. Here, we use 10.
+            Index p = 10;
+            Index ncols = matrix.cols();
+            // We'll project onto (k + p) dimensions
+            Index targetRank = k + p;
 
-            // Step 2: Form the sketch matrix
-            DenseMatrix sketch = matrix * randomMatrix;
+            // 2) Generate random Gaussian matrix Omega (n x (k+p))
+            DenseMatrix Omega = generateRandomMatrix(ncols, targetRank);
 
-            // Step 3: Perform power iterations to refine the sketch
+            // 3) Initial sketch Y0 = A * Omega
+            DenseMatrix Y = matrix * Omega;
+
+            // 4) Power iterations (with re-orthonormalization)
             for (Index i = 0; i < powerIterations; ++i) {
-                sketch = matrix * (matrix.transpose() * sketch);
+                // Orthogonalize Y
+                HouseholderQR<DenseMatrix> qrY(Y);
+                DenseMatrix QY = qrY.householderQ() * DenseMatrix::Identity(Y.rows(), targetRank);
+
+                // Z = A^T * QY
+                DenseMatrix Z = matrix.transpose() * QY; // (n x m) * (m x (k+p)) -> (n x (k+p))
+
+                // Y = A * Z
+                Y = matrix * Z;                          // (m x n) * (n x (k+p)) -> (m x (k+p))
             }
 
-            // Step 4: Compute the QR decomposition of the sketch
-            HouseholderQR<DenseMatrix> qr(sketch);
-            DenseMatrix Q = qr.householderQ() * DenseMatrix::Identity(sketch.rows(), rank);
+            // 5) Final orthonormal basis Q
+            HouseholderQR<DenseMatrix> qrFinal(Y);
+            DenseMatrix Q = qrFinal.householderQ() * DenseMatrix::Identity(Y.rows(), targetRank); // (m x (k+p))
 
-            // Step 5: Project the original matrix onto the low-dimensional subspace
+            // 6) Form the smaller matrix B = Q^T * A (size: (k+p) x n)
             DenseMatrix B = Q.transpose() * matrix;
 
-            // Step 6: Perform SVD on the small matrix B
-            // PowerMethodSVD<DenseMatrix> svd;
-            // svd.compute(B, rank, 1000, Scalar(1e-6));
-            JacobiSVD<DenseMatrix> svd;
-            svd.compute(B, ComputeThinU | ComputeThinV);
-            m_singularValues = svd.singularValues();
-            m_matrixU = Q * svd.matrixU();
-            m_matrixV = svd.matrixV();
+            // 7) SVD on the small matrix B
+            BDCSVD<DenseMatrix> svd(B, ComputeThinU | ComputeThinV);
+            const DenseVector &fullS = svd.singularValues();
+            Index actualRank         = std::min<Index>(k, fullS.size());
+
+            // 8) Truncate to rank k
+            m_singularValues = fullS.head(actualRank);
+            m_matrixU        = Q * svd.matrixU().leftCols(actualRank); // (m x (k+p)) * ((k+p) x k) => (m x k)
+            m_matrixV        = svd.matrixV().leftCols(actualRank);     // (n x (k+p)) * ((k+p) x k) => (n x k)
         }
 
         // Member variables to store results
