@@ -1,6 +1,6 @@
 // #define EIGEN_USE_BLAS
 
-#include "RandomizedSVD.h"
+#include "PowerMethodSVD.h"
 
 #include <Eigen/Dense>
 
@@ -18,13 +18,13 @@ int main() {
     // Construct the low-rank matrix A
     Eigen::MatrixXd A = U * V.transpose();
 
-    int k = 50;
+    int k = 20;
     // Perform Randomized SVD
-    Eigen::RandomizedSVD<Eigen::MatrixXd> rsvd;
-    rsvd.compute(A, k);
+    Eigen::PowerMethodSVD<Eigen::MatrixXd> pmsvd;
+    pmsvd.compute(A, k, 1e-9, 0.05, 0.001);
 
     // calculate the approximation error
-    const Eigen::MatrixXd A_approx = rsvd.matrixU() * rsvd.singularValues().asDiagonal() * rsvd.matrixV().transpose();
+    const Eigen::MatrixXd A_approx = pmsvd.matrixU() * pmsvd.singularValues().asDiagonal() * pmsvd.matrixV().transpose();
     const double frobenius_norm = (A - A_approx).norm() / A.norm();
     std::cout << "Frobenius norm of approximation error: " << frobenius_norm << std::endl;
     return 0;

@@ -145,11 +145,11 @@ namespace Eigen {
 
         GivensRotationQR() = default;
 
-        GivensRotationQR& compute(const MatrixType& matrix_o) {
-            COLAMDOrdering<int> colamdOrderer;
-            PermutationMatrix<Dynamic> perm;
-            colamdOrderer(matrix_o, perm);
-            SparseMat matrix = perm.transpose() * matrix_o;
+        GivensRotationQR& compute(const MatrixType& matrix) {
+            // COLAMDOrdering<int> colamdOrderer;
+            // PermutationMatrix<Dynamic> perm;
+            // colamdOrderer(matrix_o, perm);
+            // SparseMat matrix = perm.transpose() * matrix_o;
             Index rows = matrix.rows();
             Index cols = matrix.cols();
             m_matrixR = DenseMat(matrix);

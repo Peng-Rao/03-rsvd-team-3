@@ -4,8 +4,8 @@
 #include <chrono>
 #include <iostream>
 
-int n=1000;
-int rank=1000;
+int n=10000;
+int rank=100;
 int powerIterations=2;
 
 void setEigenThreads(int numThreads) {

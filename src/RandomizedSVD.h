@@ -69,24 +69,16 @@ namespace Eigen {
          * @return A random matrix
          */
         DenseMatrix generateRandomMatrix(Index rows, Index cols) {
-            std::random_device rd;
-            std::mt19937 gen(rd());
             std::normal_distribution<Scalar> dist(0.0, 1.0);
-
-            DenseMatrix mat(rows, cols);
-            for (Index i = 0; i < rows; ++i) {
-                for (Index j = 0; j < cols; ++j) {
-                    mat(i, j) = dist(gen);
-                }
-            }
-            return mat;
+            std::mt19937 m_gen;
+            return DenseMatrix::NullaryExpr(rows, cols, [&]() { return dist(m_gen); });
         }
 
         /**
          * @brief Perform the randomized projection
          *
          * @param matrix The input matrix
-         * @param rank Desired rank of the approximation
+         * @param k Desired rank of the approximation
          * @param powerIterations Number of power iterations
          */
         void randomProjection(const MatrixType &matrix, Index k, Index powerIterations) {
@@ -216,36 +208,75 @@ namespace Eigen {
          * @brief Perform the randomized projection for sparse matrices
          *
          * @param matrix The input sparse matrix
-         * @param rank Desired rank of the approximation
+         * @param k Desired rank of the approximation
          * @param powerIterations Number of power iterations
          */
-        void randomProjection(const SparseMatrixType &matrix, Index rank, Index powerIterations) {
-            // Step 1: Generate a random Gaussian dense matrix
-            DenseMatrix randomMatrix = generateRandomMatrix(matrix.cols(), rank);
-            // Step 2: Form the initial sketch matrix (Q = A * Omega)
-            SparseMatrixType sketch = (matrix * randomMatrix).sparseView();
-            // Step 3: Perform power iterations to enhance the approximation
+        // 使用 GivensRotationQR 来做正交化的 power iteration
+        void randomProjection(const SparseMatrixType &matrix, Index k, Index powerIterations) {
+            // 1) oversampling
+            Index p = 10;
+            Index ncols = matrix.cols();
+            Index targetRank = k + p;
+
+            // 2) 随机初始Omega
+            DenseMatrix Omega = generateRandomMatrix(ncols, targetRank);
+
+            // 3) Y = A * Omega (result is dense)
+            DenseMatrix Y = matrix * Omega;  // (m x (k+p))
+
+            // 4) power iteration
             for (Index i = 0; i < powerIterations; ++i) {
-                // Multiply by A^T * A
-                sketch = matrix * (matrix.transpose() * sketch);
+                // (a) 将 Y 转成 sparseView() 以便用 GivensRotationQR<SparseMatrixType>
+                SparseMatrixType Ysp = Y.sparseView();
+
+                // (b) 用 GivensRotationQR 做 QR
+                GivensRotationQR<SparseMatrixType> qr;
+                qr.compute(Ysp); // 内部计算出 Q
+
+                // (c) 得到 QY，用来做后续运算
+                //     Q 维度: (m x m)，我们只关心前 (m x targetRank) 列
+                //     在原来的例子中是  Q * Identity(Ysp.rows(), targetRank)
+                //     这里 Ysp.rows() == m，targetRank == (k+p)
+                DenseMatrix QY = qr.matrixQ() * DenseMatrix::Identity(Ysp.rows(), targetRank);
+
+                // (d) Z = A^T * QY
+                DenseMatrix Z = matrix.transpose() * QY; // (n x m) * (m x targetRank) => (n x targetRank)
+
+                // (e) Y = A * Z
+                Y = matrix * Z; // (m x n) * (n x targetRank) => (m x targetRank)
             }
-            // Step 4: Compute the QR decomposition of the sketch
-            GivensRotationQR<SparseMatrixType> qr;
-            qr.compute(sketch);
-            DenseMatrix Q = qr.matrixQ() * DenseMatrix::Identity(sketch.rows(), rank);
 
-            // Step 5: Project the original matrix onto the low-dimensional subspace (B = Q^T * A)
-            SparseMatrixType B = (Q.transpose() * matrix).sparseView();
+            // 5) 最终的正交基 Q
+            //    再对 Y 做一次 GivensRotationQR
+            {
+                SparseMatrixType Ysp = Y.sparseView();
+                GivensRotationQR<SparseMatrixType> qrFinal;
+                qrFinal.compute(Ysp);
+                // 得到最终 Q
+                m_finalQ = qrFinal.matrixQ() * DenseMatrix::Identity(Ysp.rows(), targetRank);
+            }
 
-            // Step 6: Perform SVD on the small dense matrix B
-            PowerMethodSVD<SparseMatrixType> svd;
-            svd.compute(B, rank, 1000, Scalar(1e-6));
-            m_singularValues = svd.singularValues();
-            m_matrixU = Q * svd.matrixU();
-            m_matrixV = svd.matrixV();
+            // 6) 小矩阵 B = Q^T * A => 维度 (targetRank x n)
+            DenseMatrix B = m_finalQ.transpose() * matrix;
+
+            // 7) 对小矩阵 B 做 SVD（选用 BDCSVD 或 JacobiSVD 都可）
+            BDCSVD<DenseMatrix> svd(B, ComputeThinU | ComputeThinV);
+            const DenseVector &fullS = svd.singularValues();
+            Index actualRank         = std::min<Index>(k, fullS.size());
+
+            // 8) 截断到 rank = k
+            m_singularValues = fullS.head(actualRank);
+
+            // 注意: svd.matrixU() 维度是 (targetRank x targetRank)，
+            //       只取前 actualRank 列 => (targetRank x actualRank)
+            //       再乘上 (m x targetRank) 的 Q => (m x actualRank)
+            m_matrixU = m_finalQ * svd.matrixU().leftCols(actualRank);
+            // V 维度 (n x targetRank)，只取前 actualRank 列 => (n x actualRank)
+            m_matrixV = svd.matrixV().leftCols(actualRank);
         }
 
         // Member variables to store results
+        DenseMatrix m_finalQ;
         DenseMatrix m_matrixU;
         DenseMatrix m_matrixV;
         DenseVector m_singularValues;
