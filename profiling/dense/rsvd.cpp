@@ -9,8 +9,8 @@
 
 int main() {
     // Generate a low rank random dense matrix
-    const int rows = 100;
-    const int cols = 100;
+    const int rows = 1000;
+    const int cols = 1000;
     const int low_rank = 50;
     Eigen::MatrixXd U = Eigen::MatrixXd::Random(rows, low_rank);
     Eigen::MatrixXd V = Eigen::MatrixXd::Random(cols, low_rank);

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Catch2TestRun name="sparse_qr" rng-seed="2297667128" xml-format-version="3" catch2-version="3.7.1">
+  <TestCase name="Eigen SparseQR Decomposition Benchmark" tags="[SparseQR_bench_dynamic]" filename="/Users/raopend/Workspace/03-rsvd-team-3/benchmarks/sparse/sparse_qr.cpp" line="50">
+    <BenchmarkResults name="SparseQR with sparse matrix size 100" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="4.42316e+07">
+      <!-- All values in nano seconds -->
+      <mean value="444070" lowerBound="442094" upperBound="446692" ci="0.95"/>
+      <standardDeviation value="11630.4" lowerBound="9279.98" upperBound="15184.8" ci="0.95"/>
+      <outliers variance="0.199954" lowMild="0" lowSevere="0" highMild="8" highSevere="3"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 200" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="4.21494e+08">
+      <!-- All values in nano seconds -->
+      <mean value="4.18246e+06" lowerBound="4.17061e+06" upperBound="4.19666e+06" ci="0.95"/>
+      <standardDeviation value="66074.8" lowerBound="56453.2" upperBound="77507.6" ci="0.95"/>
+      <outliers variance="0.0849289" lowMild="0" lowSevere="0" highMild="6" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 300" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="1.55863e+09">
+      <!-- All values in nano seconds -->
+      <mean value="1.55795e+07" lowerBound="1.55192e+07" upperBound="1.56493e+07" ci="0.95"/>
+      <standardDeviation value="330960" lowerBound="286171" upperBound="399479" ci="0.95"/>
+      <outliers variance="0.14221" lowMild="0" lowSevere="0" highMild="2" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 400" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="3.73772e+09">
+      <!-- All values in nano seconds -->
+      <mean value="3.76962e+07" lowerBound="3.75471e+07" upperBound="3.7885e+07" ci="0.95"/>
+      <standardDeviation value="852312" lowerBound="684923" upperBound="1.12586e+06" ci="0.95"/>
+      <outliers variance="0.161167" lowMild="0" lowSevere="0" highMild="2" highSevere="2"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 500" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="7.39195e+09">
+      <!-- All values in nano seconds -->
+      <mean value="7.49845e+07" lowerBound="7.48549e+07" upperBound="7.51071e+07" ci="0.95"/>
+      <standardDeviation value="641864" lowerBound="549737" upperBound="777594" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="3" lowSevere="0" highMild="1" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 600" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="1.29214e+10">
+      <!-- All values in nano seconds -->
+      <mean value="1.28679e+08" lowerBound="1.28369e+08" upperBound="1.29e+08" ci="0.95"/>
+      <standardDeviation value="1.61269e+06" lowerBound="1.42682e+06" upperBound="1.88281e+06" ci="0.95"/>
+      <outliers variance="0.0150114" lowMild="0" lowSevere="0" highMild="1" highSevere="0"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 700" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="2.0605e+10">
+      <!-- All values in nano seconds -->
+      <mean value="2.05016e+08" lowerBound="2.04081e+08" upperBound="2.07232e+08" ci="0.95"/>
+      <standardDeviation value="6.9283e+06" lowerBound="3.5893e+06" upperBound="1.39254e+07" ci="0.95"/>
+      <outliers variance="0.296852" lowMild="0" lowSevere="0" highMild="0" highSevere="3"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 800" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="3.15149e+10">
+      <!-- All values in nano seconds -->
+      <mean value="3.13945e+08" lowerBound="3.12076e+08" upperBound="3.16877e+08" ci="0.95"/>
+      <standardDeviation value="1.18024e+07" lowerBound="8.39332e+06" upperBound="1.60076e+07" ci="0.95"/>
+      <outliers variance="0.345672" lowMild="0" lowSevere="0" highMild="4" highSevere="8"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 900" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="4.38629e+10">
+      <!-- All values in nano seconds -->
+      <mean value="4.48206e+08" lowerBound="4.44898e+08" upperBound="4.53469e+08" ci="0.95"/>
+      <standardDeviation value="2.0794e+07" lowerBound="1.45378e+07" upperBound="3.07132e+07" ci="0.95"/>
+      <outliers variance="0.444639" lowMild="0" lowSevere="0" highMild="6" highSevere="13"/>
+    </BenchmarkResults>
+    <BenchmarkResults name="SparseQR with sparse matrix size 1000" samples="100" resamples="100000" iterations="1" clockResolution="17.9056" estimatedDuration="6.34757e+10">
+      <!-- All values in nano seconds -->
+      <mean value="6.06655e+08" lowerBound="6.05365e+08" upperBound="6.08173e+08" ci="0.95"/>
+      <standardDeviation value="7.13653e+06" lowerBound="6.06092e+06" upperBound="8.50215e+06" ci="0.95"/>
+      <outliers variance="0.0099" lowMild="0" lowSevere="0" highMild="6" highSevere="0"/>
+    </BenchmarkResults>
+    <OverallResult success="true" skips="0"/>
+  </TestCase>
+  <OverallResults successes="0" failures="0" expectedFailures="0" skips="0"/>
+  <OverallResultsCases successes="1" failures="0" expectedFailures="0" skips="0"/>
+</Catch2TestRun>

@@ -211,32 +211,21 @@ namespace Eigen {
          * @param k Desired rank of the approximation
          * @param powerIterations Number of power iterations
          */
-        // 使用 GivensRotationQR 来做正交化的 power iteration
         void randomProjection(const SparseMatrixType &matrix, Index k, Index powerIterations) {
-            // 1) oversampling
             Index p = 10;
             Index ncols = matrix.cols();
             Index targetRank = k + p;
 
-            // 2) 随机初始Omega
             DenseMatrix Omega = generateRandomMatrix(ncols, targetRank);
 
-            // 3) Y = A * Omega (result is dense)
             DenseMatrix Y = matrix * Omega;  // (m x (k+p))
 
-            // 4) power iteration
             for (Index i = 0; i < powerIterations; ++i) {
-                // (a) 将 Y 转成 sparseView() 以便用 GivensRotationQR<SparseMatrixType>
                 SparseMatrixType Ysp = Y.sparseView();
 
-                // (b) 用 GivensRotationQR 做 QR
                 GivensRotationQR<SparseMatrixType> qr;
-                qr.compute(Ysp); // 内部计算出 Q
+                qr.compute(Ysp);
 
-                // (c) 得到 QY，用来做后续运算
-                //     Q 维度: (m x m)，我们只关心前 (m x targetRank) 列
-                //     在原来的例子中是  Q * Identity(Ysp.rows(), targetRank)
-                //     这里 Ysp.rows() == m，targetRank == (k+p)
                 DenseMatrix QY = qr.matrixQ() * DenseMatrix::Identity(Ysp.rows(), targetRank);
 
                 // (d) Z = A^T * QY
@@ -246,32 +235,21 @@ namespace Eigen {
                 Y = matrix * Z; // (m x n) * (n x targetRank) => (m x targetRank)
             }
 
-            // 5) 最终的正交基 Q
-            //    再对 Y 做一次 GivensRotationQR
             {
                 SparseMatrixType Ysp = Y.sparseView();
                 GivensRotationQR<SparseMatrixType> qrFinal;
                 qrFinal.compute(Ysp);
-                // 得到最终 Q
                 m_finalQ = qrFinal.matrixQ() * DenseMatrix::Identity(Ysp.rows(), targetRank);
             }
 
-            // 6) 小矩阵 B = Q^T * A => 维度 (targetRank x n)
             DenseMatrix B = m_finalQ.transpose() * matrix;
 
-            // 7) 对小矩阵 B 做 SVD（选用 BDCSVD 或 JacobiSVD 都可）
             BDCSVD<DenseMatrix> svd(B, ComputeThinU | ComputeThinV);
             const DenseVector &fullS = svd.singularValues();
             Index actualRank         = std::min<Index>(k, fullS.size());
 
-            // 8) 截断到 rank = k
             m_singularValues = fullS.head(actualRank);
-
-            // 注意: svd.matrixU() 维度是 (targetRank x targetRank)，
-            //       只取前 actualRank 列 => (targetRank x actualRank)
-            //       再乘上 (m x targetRank) 的 Q => (m x actualRank)
             m_matrixU = m_finalQ * svd.matrixU().leftCols(actualRank);
-            // V 维度 (n x targetRank)，只取前 actualRank 列 => (n x actualRank)
             m_matrixV = svd.matrixV().leftCols(actualRank);
         }
 
