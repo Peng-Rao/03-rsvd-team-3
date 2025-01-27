@@ -6,378 +6,328 @@
 #include <Eigen/Core>
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+
+#include <cmath>
+#include <iostream>
 #include <random>
 
 namespace Eigen {
-/**
- * @brief Base class template (default for dense matrices)
- */
-template<typename MatrixType, bool IsSparse = is_sparse_matrix<MatrixType>::value>
-class PowerMethodSVD;
-
-// ==============================
-// Specialization for Dense Matrices
-// ==============================
-template<typename MatrixType>
-class PowerMethodSVD<MatrixType, false> {
-public:
-    using Scalar = typename MatrixType::Scalar;
-    using Index = typename MatrixType::Index;
-    using DenseMatrix = Matrix<Scalar, Dynamic, Dynamic>;
-    using DenseVector = Matrix<Scalar, Dynamic, 1>;
-
-    PowerMethodSVD() = default;
-
     /**
-     * @brief Compute the SVD of a dense matrix up to the given rank using power method + deflation
-     *
-     * @param matrix The input dense matrix to decompose
-     * @param rank Desired rank of the approximation
-     * @param maxIters Maximum iterations for each singular value extraction
-     * @param tol Tolerance for convergence
-     * @return Reference to this object
+     * @brief Base class template (default for dense matrices)
      */
-    PowerMethodSVD &compute(const MatrixType &matrix,
-                            Index rank,
-                            Index maxIters = 1000,
-                            Scalar tol = 1e-6) {
+    template<typename MatrixType, bool IsSparse = is_sparse_matrix<MatrixType>::value>
+    class PowerMethodSVD {
+    public:
+        using Scalar = typename MatrixType::Scalar;
+        using Index = typename MatrixType::Index;
+        using DenseMatrix = Matrix<Scalar, Dynamic, Dynamic>;
+        using DenseVector = Matrix<Scalar, Dynamic, 1>;
 
-        // Make a copy of the matrix since we will deflate it
-        DenseMatrix A = matrix.template cast<Scalar>();
-        Index m = A.rows();
-        Index n = A.cols();
-        Index k = std::min(rank, std::min(m, n));
+        PowerMethodSVD() = default;
 
-        m_singularValues.resize(k);
-        m_matrixU.resize(m, k);
-        m_matrixV.resize(n, k);
+        /**
+         * @brief Compute a rank-k SVD approximation of 'matrix' using repeated 1-vector
+         *        power-method and deflation.  We follow the pseudocode in your picture:
+         *
+         *        for each rank-1:
+         *           1) pick x ~ N(0,1)
+         *           2) s = log(4 log(2n/delta)/(epsDelta)) / (2 lambda)
+         *           3) repeat s times: x <- A^T A x;  x <- x / ||x||
+         *           4) sigma = ||A x||; u = (A x)/sigma
+         *           5) deflate: A <- A - sigma * u * x^T
+         *
+         * @param matrix  The input matrix
+         * @param rank    Number of singular values/vectors to compute
+         * @param epsDelta tolerance for convergence
+         * @param delta   scaling factor
+         * @param lambda  regularization parameter
+         */
+        PowerMethodSVD &compute(const MatrixType &matrix, Index rank, const double epsDelta = 1e-9,
+                                const double delta = 0.05, const double lambda = 0.1) {
+            // Copy into a modifiable matrix for deflation
+            DenseMatrix A = matrix.template cast<Scalar>();
 
-        for (Index i = 0; i < k; ++i) {
-            // Extract the largest singular value/vector via power method
-            Scalar sigma;
-            DenseVector u(m), v(n);
-            bool success = extractLargestSingularValue(A, sigma, u, v, maxIters, tol);
+            Index m = A.rows();
+            Index n = A.cols();
 
-            if (!success) {
-                // If we fail to converge, we just break early
-                m_singularValues.conservativeResize(i);
-                m_matrixU.conservativeResize(m, i);
-                m_matrixV.conservativeResize(n, i);
-                break;
+            // We only compute up to the smaller dimension or user-specified rank
+            Index k = std::min(rank, std::min(m, n));
+
+            // Allocate storage for S, U, V
+            m_singularValues.resize(k);
+            m_matrixU.resize(m, k);
+            m_matrixV.resize(n, k);
+
+            using std::ceil;
+            using std::log;
+            const double insideLog = 4.0 * log((2.0 * n) / delta) / epsDelta;
+            const double sReal = log(insideLog) / (2.0 * lambda);
+            const int s = static_cast<int>(ceil(sReal));
+
+            // For each rank-1 piece, do:
+            for (Index i = 0; i < k; ++i) {
+                Scalar sigma;
+                DenseVector u(m), v(n);
+
+                // Extract top singular value/vector from the current deflated A
+                bool success = extractLargestSingularValue(A, sigma, u, v, s);
+                if (!success) {
+                    // If we fail, shrink the storage and stop
+                    m_singularValues.conservativeResize(i);
+                    m_matrixU.conservativeResize(m, i);
+                    m_matrixV.conservativeResize(n, i);
+                    break;
+                }
+
+                // Store results
+                m_singularValues(i) = sigma;
+                m_matrixU.col(i) = u;
+                m_matrixV.col(i) = v;
+
+                // Deflate: A <- A - sigma * u * v^T
+                A.noalias() -= sigma * (u * v.transpose());
             }
 
-            m_singularValues(i) = sigma;
-            m_matrixU.col(i) = u;
-            m_matrixV.col(i) = v;
-
-            // Deflate the matrix
-            A = A - sigma * u * v.transpose();
+            return *this;
         }
 
-        return *this;
-    }
+        /**
+         * @return Vector of singular values
+         */
+        const DenseVector &singularValues() const { return m_singularValues; }
 
-    /**
-     * @brief Get the singular values
-     * @return A vector containing the singular values
-     */
-    const DenseVector &singularValues() const { return m_singularValues; }
+        /**
+         * @return The left singular vectors (matrix U)
+         */
+        const DenseMatrix &matrixU() const { return m_matrixU; }
 
-    /**
-     * @brief Get the left singular vectors (U matrix)
-     * @return The U matrix
-     */
-    const DenseMatrix &matrixU() const { return m_matrixU; }
+        /**
+         * @return The right singular vectors (matrix V)
+         */
+        const DenseMatrix &matrixV() const { return m_matrixV; }
 
-    /**
-     * @brief Get the right singular vectors (V matrix)
-     * @return The V matrix
-     */
-    const DenseMatrix &matrixV() const { return m_matrixV; }
+    private:
+        /**
+         * @brief Extract the largest singular value/vector from A by
+         *        (a) one-vector power method on (A^T A)
+         *        (b) computing sigma = ||A v||
+         *        (c) u = (A v)/sigma
+         *
+         * The iteration count 's' is chosen from:
+         *   s = log( 4 log(2n/delta) / (epsDelta) ) / (2 lambda)
+         *
+         * @param A        The current (deflated) matrix
+         * @param sigma    (output) the largest singular value found
+         * @param u        (output) left singular vector
+         * @param v        (output) right singular vector
+         * @param s       Number of iterations for power method
+         * @return True if we found a non-trivial singular vector (sigma>0),
+         *         false otherwise
+         */
+        bool extractLargestSingularValue(const DenseMatrix &A, Scalar &sigma, DenseVector &u, DenseVector &v,
+                                         const int s) {
 
-private:
-    /**
-     * @brief Use power method to find the largest singular value/vector of A (Dense)
-     *
-     * @param A Input dense matrix
-     * @param sigma (output) largest singular value
-     * @param u (output) left singular vector
-     * @param v (output) right singular vector
-     * @param maxIters Maximum iterations
-     * @param tol Convergence tolerance
-     * @return True if converged, false otherwise
-     */
-    bool extractLargestSingularValue(const DenseMatrix &A,
-                                     Scalar &sigma,
-                                     DenseVector &u,
-                                     DenseVector &v,
-                                     Index maxIters,
-                                     Scalar tol) {
-        Index m = A.rows();
-        Index n = A.cols();
+            Index n = A.cols();
+            // 1) random initialization for v
+            v = randomVector(n);
 
-        // Initialize v with random values
-        v = randomVector(n);
-        v.normalize();
+            // 2) compute s
 
-        // Temporary vectors
-        DenseVector u_new(m), v_new(n);
-        sigma = 0;
-
-        for (Index iter = 0; iter < maxIters; ++iter) {
-            // Compute u = A * v
-            u_new = A * v;
-            Scalar u_norm = u_new.norm();
-            if (u_norm < tol) {
-                return false; // A * v is zero vector, no meaningful singular value
-            }
-            u_new /= u_norm;
-
-            // Compute v = A^T * u
-            v_new = A.transpose() * u_new;
-            Scalar v_norm = v_new.norm();
-            if (v_norm < tol) {
-                return false; // A^T * u is zero, can't proceed
-            }
-            v_new /= v_norm;
-
-            // Check convergence of v
-            Scalar diff = (v_new - v).norm();
-            v = v_new;
-            u = u_new;
-
-            if (diff < tol) {
-                // Converged
-                break;
+            // 3) do s iterations of v <- A^T A v, normalize
+            for (int i = 0; i < s; ++i) {
+                DenseVector temp = A.transpose() * (A * v);
+                double normTemp = temp.norm();
+                if (normTemp < 1e-14) {
+                    return false; // A^T A v ~ 0 => degenerate
+                }
+                v = temp / normTemp;
             }
 
-            if (iter == maxIters - 1) {
-                // Did not converge
+            // 4) sigma = ||A v||
+            DenseVector Av = A * v;
+            sigma = Av.norm();
+            if (sigma < 1e-14) {
                 return false;
             }
-        }
 
-        // Once converged, compute sigma = ||A * v||
-        DenseVector Av = A * v;
-        sigma = Av.norm();
-
-        // Ensure consistency: we want u = (A * v) / sigma
-        if (sigma > Scalar(0)) {
+            //    u = (A v)/sigma
             u = Av / sigma;
-        } else {
-            return false;
+            return true;
         }
 
-        return true;
-    }
+        /**
+         * @brief Generate a random vector of length 'n' ~ Normal(0,1)
+         */
+        DenseVector randomVector(Index n) const {
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            std::normal_distribution<Scalar> dist(0.0, 1.0);
 
-    /**
-     * @brief Generate a random vector of length n
-     */
-    DenseVector randomVector(Index n) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::normal_distribution<Scalar> dist(0.0, 1.0);
-
-        DenseVector vec(n);
-        for (Index i = 0; i < n; ++i) {
-            vec(i) = dist(gen);
-        }
-        return vec;
-    }
-
-    DenseMatrix m_matrixU;
-    DenseMatrix m_matrixV;
-    DenseVector m_singularValues;
-};
-
-// Specialization for Sparse Matrices
-template<typename MatrixType>
-class PowerMethodSVD<MatrixType, true> {
-public:
-    using Scalar = typename MatrixType::Scalar;
-    using Index = typename MatrixType::Index;
-    using DenseMatrix = Matrix<Scalar, Dynamic, Dynamic>;
-    using DenseVector = Matrix<Scalar, Dynamic, 1>;
-
-    // Determine storage order based on MatrixType
-    static constexpr int StorageOrder = MatrixType::IsRowMajor ? RowMajor : ColMajor;
-
-    using SparseMatrixType = SparseMatrix<Scalar, StorageOrder, Index>;
-
-    PowerMethodSVD() = default;
-
-    /**
-     * @brief Compute the SVD of a sparse matrix up to the given rank using power method + deflation
-     *
-     * @param matrix The input sparse matrix to decompose
-     * @param rank Desired rank of the approximation
-     * @param maxIters Maximum iterations for each singular value extraction
-     * @param tol Tolerance for convergence
-     * @return Reference to this object
-     */
-    PowerMethodSVD &compute(const MatrixType &matrix,
-                            Index rank,
-                            Index maxIters = 1000,
-                            Scalar tol = 1e-6) {
-
-        // Make a copy of the matrix since we will deflate it
-        SparseMatrixType A_sparse = matrix;
-        A_sparse.makeCompressed();
-
-        Index m = A_sparse.rows();
-        Index n = A_sparse.cols();
-        Index k = std::min(rank, std::min(m, n));
-
-        m_singularValues.resize(k);
-        m_matrixU.resize(m, k);
-        m_matrixV.resize(n, k);
-
-        for (Index i = 0; i < k; ++i) {
-            // Extract the largest singular value/vector via power method
-            Scalar sigma;
-            DenseVector u(m), v(n);
-            bool success = extractLargestSingularValueSparse(A_sparse, sigma, u, v, maxIters, tol);
-
-            if (!success) {
-                // If we fail to converge, we just break early
-                m_singularValues.conservativeResize(i);
-                m_matrixU.conservativeResize(m, i);
-                m_matrixV.conservativeResize(n, i);
-                break;
+            DenseVector vec(n);
+            for (Index i = 0; i < n; ++i) {
+                vec(i) = dist(gen);
             }
+            return vec;
+        }
 
-            m_singularValues(i) = sigma;
-            m_matrixU.col(i) = u;
-            m_matrixV.col(i) = v;
+        DenseMatrix m_matrixU; ///< Left singular vectors
+        DenseMatrix m_matrixV; ///< Right singular vectors
+        DenseVector m_singularValues; ///< The singular values
+    };
 
-            // Deflate the matrix
-            // Subtract sigma * u * v.transpose() from A_sparse
-            // Since u and v are dense, compute their outer product and convert to sparse
-            DenseMatrix uvT = u * v.transpose();
-            SparseMatrixType uvT_sparse = uvT.sparseView();
+    // Specialization for Sparse Matrices
+    /**
+     * @brief Sparse specialization of PowerMethodSVD, consistent with the dense algorithm.
+     */
+    template<typename MatrixType>
+    class PowerMethodSVD<MatrixType, true> {
+    public:
+        using Scalar = typename MatrixType::Scalar;
+        using Index = typename MatrixType::Index;
+        using DenseMatrix = Matrix<Scalar, Dynamic, Dynamic>;
+        using DenseVector = Matrix<Scalar, Dynamic, 1>;
 
-            A_sparse = A_sparse - sigma * uvT_sparse;
-            A_sparse.prune(1e-12); // Remove near-zero elements to maintain sparsity
+        static constexpr int StorageOrder = MatrixType::IsRowMajor ? RowMajor : ColMajor;
+        using SparseMatrixType = SparseMatrix<Scalar, StorageOrder, Index>;
+
+        PowerMethodSVD() = default;
+
+        /**
+         * @brief Compute a rank-k SVD approximation of the sparse matrix 'matrix' using
+         *        repeated 1-vector power-method and deflation, similar to the dense version:
+         *        for each rank-1:
+         *           1) pick v ~ N(0,1)
+         *           2) s = log(4 log(2n/delta)/(epsDelta)) / (2 lambda)
+         *           3) repeat s times: v <- A^T (A v);  v <- v / ||v||
+         *           4) sigma = ||A v||; u = (A v)/sigma
+         *           5) deflate: A <- A - sigma * u * v^T
+         *
+         * @param matrix    Input sparse matrix
+         * @param rank      Number of singular values/vectors to compute
+         * @param epsDelta  Tolerance scaling
+         * @param delta     Probability-like factor
+         * @param lambda    Regularization parameter controlling # of iterations
+         * @return          Reference to this for chaining
+         */
+        PowerMethodSVD &compute(const MatrixType &matrix, Index rank, double epsDelta = 1e-9, double delta = 0.05,
+                                double lambda = 0.1) {
+            // Copy the sparse matrix (so we can deflate)
+            SparseMatrixType A_sparse = matrix;
             A_sparse.makeCompressed();
+
+            Index m = A_sparse.rows();
+            Index n = A_sparse.cols();
+            Index k = std::min(rank, std::min(m, n));
+
+            m_singularValues.resize(k);
+            m_matrixU.resize(m, k);
+            m_matrixV.resize(n, k);
+
+            using std::ceil;
+            using std::log;
+            const double insideLog = 4.0 * log((2.0 * n) / delta) / epsDelta;
+            const double sReal = log(insideLog) / (2.0 * lambda);
+            const int s = static_cast<int>(ceil(sReal));
+
+            // Extract each rank-1 contribution
+            for (Index i = 0; i < k; ++i) {
+                Scalar sigma;
+                DenseVector u(m), v(n);
+
+                bool success = extractLargestSingularValueSparse(A_sparse, sigma, u, v, s);
+                if (!success) {
+                    // If we fail, break early
+                    m_singularValues.conservativeResize(i);
+                    m_matrixU.conservativeResize(m, i);
+                    m_matrixV.conservativeResize(n, i);
+                    break;
+                }
+
+                // Store the results
+                m_singularValues(i) = sigma;
+                m_matrixU.col(i) = u;
+                m_matrixV.col(i) = v;
+
+                // Deflate A <- A - sigma * u * v^T
+                DenseMatrix uvT = u * v.transpose(); // (m x n)
+                SparseMatrixType uvT_sparse = uvT.sparseView();
+                A_sparse = A_sparse - sigma * uvT_sparse;
+
+                // Optionally prune small entries for numerical stability
+                A_sparse.prune(Scalar(1e-12));
+                A_sparse.makeCompressed();
+            }
+
+            return *this;
         }
 
-        return *this;
-    }
+        const DenseVector &singularValues() const { return m_singularValues; }
+        const DenseMatrix &matrixU() const { return m_matrixU; }
+        const DenseMatrix &matrixV() const { return m_matrixV; }
 
-    /**
-     * @brief Get the singular values
-     * @return A vector containing the singular values
-     */
-    const DenseVector &singularValues() const { return m_singularValues; }
+    private:
+        /**
+         * @brief Same core power-method for the largest singular value of A (sparse),
+         *        matching the dense approach:
+         *         1) random v
+         *         2) s iterations: v <- A^T(A v), v <- v/||v||
+         *         3) sigma = ||A v||
+         *         4) u = A v / sigma
+         *
+         * @param A      Current deflated matrix
+         * @param sigma  (output) largest singular value
+         * @param u      (output) left singular vector
+         * @param v      (output) right singular vector
+         * @param s      Number of power iterations
+         * @return       True if a non-trivial singular vector is found
+         */
+        bool extractLargestSingularValueSparse(const SparseMatrixType &A, Scalar &sigma, DenseVector &u, DenseVector &v,
+                                               int s) {
+            const Index n = A.cols();
+            // 1) Random initialization of v
+            v = randomVector(n);
 
-    /**
-     * @brief Get the left singular vectors (U matrix)
-     * @return The U matrix
-     */
-    const DenseMatrix &matrixU() const { return m_matrixU; }
-
-    /**
-     * @brief Get the right singular vectors (V matrix)
-     * @return The V matrix
-     */
-    const DenseMatrix &matrixV() const { return m_matrixV; }
-
-private:
-    /**
-     * @brief Use power method to find the largest singular value/vector of A (Sparse)
-     *
-     * @param A Input sparse matrix
-     * @param sigma (output) largest singular value
-     * @param u (output) left singular vector
-     * @param v (output) right singular vector
-     * @param maxIters Maximum iterations
-     * @param tol Convergence tolerance
-     * @return True if converged, false otherwise
-     */
-    bool extractLargestSingularValueSparse(const SparseMatrixType &A,
-                                           Scalar &sigma,
-                                           DenseVector &u,
-                                           DenseVector &v,
-                                           Index maxIters,
-                                           Scalar tol) {
-        Index m = A.rows();
-        Index n = A.cols();
-
-        // Initialize v with random values
-        v = randomVector(n);
-        v.normalize();
-
-        // Temporary vectors
-        DenseVector u_new(m), v_new(n);
-        sigma = 0;
-
-        for (Index iter = 0; iter < maxIters; ++iter) {
-            // Compute u = A * v
-            u_new = A * v;
-            Scalar u_norm = u_new.norm();
-            if (u_norm < tol) {
-                return false; // A * v is zero vector, no meaningful singular value
-            }
-            u_new /= u_norm;
-
-            // Compute v = A^T * u
-            v_new = A.transpose() * u_new;
-            Scalar v_norm = v_new.norm();
-            if (v_norm < tol) {
-                return false; // A^T * u is zero, can't proceed
-            }
-            v_new /= v_norm;
-
-            // Check convergence of v
-            Scalar diff = (v_new - v).norm();
-            v = v_new;
-            u = u_new;
-
-            if (diff < tol) {
-                // Converged
-                break;
+            // 2) Power iterations
+            for (int i = 0; i < s; ++i) {
+                DenseVector temp = A.transpose() * (A * v);
+                double normTemp = temp.norm();
+                if (normTemp < 1e-14) {
+                    return false; // Degenerate direction
+                }
+                v = temp / normTemp;
             }
 
-            if (iter == maxIters - 1) {
-                // Did not converge
+            // 3) sigma = ||A v||
+            DenseVector Av = A * v;
+            sigma = Av.norm();
+            if (sigma < 1e-14) {
                 return false;
             }
-        }
 
-        // Once converged, compute sigma = ||A * v||
-        DenseVector Av = A * v;
-        sigma = Av.norm();
-
-        // Ensure consistency: we want u = (A * v) / sigma
-        if (sigma > Scalar(0)) {
+            // 4) u = (A v)/sigma
             u = Av / sigma;
-        } else {
-            return false;
+            return true;
         }
 
-        return true;
-    }
+        /**
+         * @brief Generate a random Gaussian vector of length 'n'
+         */
+        DenseVector randomVector(Index n) const {
+            static std::random_device rd;
+            static std::mt19937 gen(rd());
+            std::normal_distribution<Scalar> dist(Scalar(0), Scalar(1));
 
-    /**
-     * @brief Generate a random vector of length n
-     */
-    DenseVector randomVector(Index n) {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        std::normal_distribution<Scalar> dist(0.0, 1.0);
-
-        DenseVector vec(n);
-        for (Index i = 0; i < n; ++i) {
-            vec(i) = dist(gen);
+            DenseVector vec(n);
+            for (Index i = 0; i < n; ++i) {
+                vec(i) = dist(gen);
+            }
+            return vec;
         }
-        return vec;
-    }
 
-    DenseMatrix m_matrixU;
-    DenseMatrix m_matrixV;
-    DenseVector m_singularValues;
-};
+        DenseMatrix m_matrixU; ///< Left singular vectors
+        DenseMatrix m_matrixV; ///< Right singular vectors
+        DenseVector m_singularValues; ///< Singular values
+    };
 
 } // namespace Eigen
 

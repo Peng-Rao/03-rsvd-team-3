@@ -146,6 +146,10 @@ namespace Eigen {
         GivensRotationQR() = default;
 
         GivensRotationQR& compute(const MatrixType& matrix) {
+            // COLAMDOrdering<int> colamdOrderer;
+            // PermutationMatrix<Dynamic> perm;
+            // colamdOrderer(matrix_o, perm);
+            // SparseMat matrix = perm.transpose() * matrix_o;
             Index rows = matrix.rows();
             Index cols = matrix.cols();
             m_matrixR = DenseMat(matrix);
@@ -209,7 +213,7 @@ namespace Eigen {
          * @param c Output cosine
          * @param s Output sine
          */
-        void computeGivensRotation(Scalar a, Scalar b, Scalar& c, Scalar& s) {
+        EIGEN_STRONG_INLINE void computeGivensRotation(Scalar a, Scalar b, Scalar& c, Scalar& s) {
             if (b == Scalar(0)) {
                 c = Scalar(1);
                 s = Scalar(0);
@@ -229,7 +233,7 @@ namespace Eigen {
          * @param c Cosine of the rotation
          * @param s Sine of the rotation
          */
-        void applyGivensRotationQ(DenseMat& matrix, Index i, Index k, Scalar c, Scalar s) {
+        EIGEN_STRONG_INLINE void applyGivensRotationQ(DenseMat& matrix, Index i, Index k, Scalar c, Scalar s) {
             /*
              * Apply the rotation to the columns of the matrix
              * Q = I * G_1^T * G_2^T * ... * G_n^T
@@ -272,7 +276,7 @@ namespace Eigen {
          * @param c Cosine of the rotation
          * @param s Sine of the rotation
          */
-        void applyGivensRotationR(DenseMat& matrix, Index i, Index k, Scalar c, Scalar s) {
+        EIGEN_STRONG_INLINE void applyGivensRotationR(DenseMat& matrix, Index i, Index k, Scalar c, Scalar s) {
             /*
              * Apply the rotation to the rows of the matrix
              * R = G_n * ... * G_2 * G_1 * A

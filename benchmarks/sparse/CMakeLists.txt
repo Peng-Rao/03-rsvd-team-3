@@ -1,0 +1,16 @@
+add_executable(givens_qr_sparse givens_qr.cpp)
+target_link_libraries(givens_qr_sparse PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(givens_qr_sparse PRIVATE Eigen3::Eigen)
+target_link_libraries(givens_qr_sparse PRIVATE OpenMP::OpenMP_CXX)
+target_compile_options(givens_qr_sparse PRIVATE -O3 -march=native)
+
+add_executable(sparse_qr sparse_qr.cpp)
+target_link_libraries(sparse_qr PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(sparse_qr PRIVATE Eigen3::Eigen)
+target_link_libraries(sparse_qr PRIVATE OpenMP::OpenMP_CXX)
+target_compile_options(sparse_qr PRIVATE -O3 -march=native)
+
+add_executable(sparse_svd sparse_svd.cpp)
+target_link_libraries(sparse_svd PRIVATE Eigen3::Eigen)
+target_link_libraries(sparse_svd PRIVATE OpenMP::OpenMP_CXX)
+target_compile_options(sparse_svd PRIVATE -O3 -march=native)

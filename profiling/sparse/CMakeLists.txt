@@ -1,0 +1,17 @@
+add_executable(rsvd_sparse_profiling rsvd.cpp)
+target_link_libraries(rsvd_sparse_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(rsvd_sparse_profiling PRIVATE OpenMP::OpenMP_CXX)
+#target_link_libraries(rsvd_sparse_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(rsvd_sparse_profiling PRIVATE -O3 -march=native)
+
+add_executable(pmsvd_sparse_profiling pmsvd.cpp)
+target_link_libraries(pmsvd_sparse_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(pmsvd_sparse_profiling PRIVATE OpenMP::OpenMP_CXX)
+#target_link_libraries(pmsvd_sparse_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(pmsvd_sparse_profiling PRIVATE -O3 -march=native)
+
+add_executable(qr_sparse_profiling qr.cpp)
+target_link_libraries(qr_sparse_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(qr_sparse_profiling PRIVATE OpenMP::OpenMP_CXX)
+#target_link_libraries(qr_sparse_profiling PRIVATE OpenBLAS::OpenBLAS)
+target_compile_options(qr_sparse_profiling PRIVATE -O3 -march=native)

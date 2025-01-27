@@ -3,6 +3,7 @@
     "catch2",
     "eigen3",
     "mpi",
-    "openblas"
+    "openblas",
+    "stb"
   ]
 }
