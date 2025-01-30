@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include "RandomizedSVD.h"
+#include "PCA.h"
 
 using namespace std;
 
@@ -40,23 +41,4 @@ Eigen::MatrixXd PCA(const Eigen::MatrixXd& data, int num_components, int rank) {
 
     // Step 5: data projection
     return centered * projection_matrix;
-}
-
-int main(){
-    // data example
-    Eigen::MatrixXd data(5, 3);
-    data << 2.5, 2.4, 1.5,
-            0.5, 0.7, 0.3,
-            2.2, 2.9, 1.6,
-            1.9, 2.2, 1.1,
-            3.1, 3.0, 1.8;
-
-    cout << "原始数据:\n" << data << endl;
-
-    // reduced data
-    Eigen::MatrixXd reduced_data = PCA(data, 2, 2);
-
-    cout << "降维后的数据:\n" << reduced_data << endl;
-
-    return 0;
 }
