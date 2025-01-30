@@ -4,6 +4,11 @@
     "eigen3",
     "mpi",
     "openblas",
-    "stb"
+    "stb",
+    {
+      "name": "opencv4",
+      "features": ["dnn", "highgui"],
+      "default-features": false
+    }
   ]
 }

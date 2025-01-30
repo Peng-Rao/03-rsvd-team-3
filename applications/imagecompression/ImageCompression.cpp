@@ -1,6 +1,3 @@
-#ifndef IMAGECOMPRESSIONG_H
-#define IMAGECOMPRESSIONG_H
-
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>
@@ -134,5 +131,3 @@ int main(int argc, char *argv[]) {
     cout << "Image successfully saved to " << output_image_path << endl;
     return 0;
 }
-
-#endif
