@@ -276,9 +276,64 @@ In this section, we present some useful applications of the RandomizedSVD algori
 
 
 \subsection{Handwritten Numbers Recognition}
-\subsubsection{Code Explanation}
-\subsubsection{Results Analysis}
+We implemented a handwritten digit recognition system using the MNIST dataset and our RandomizedSVD algorithm for dimensionality reduction. The system demonstrates how dimensionality reduction can be effectively used for classification tasks while maintaining high accuracy.
 
+\subsubsection{Implementation Details}
+The implementation consists of several key components:
+
+\begin{itemize}
+    \item \textbf{Data Loading}: The \texttt{MNISTLoader} class handles loading and preprocessing of the MNIST dataset, converting the binary data into Eigen matrices and normalizing pixel values to [0,1].
+    
+    \item \textbf{Dimensionality Reduction}: We use PCA with RandomizedSVD to reduce the dimension of the input images (784 dimensions) to a lower-dimensional space (2-256 components in our tests).
+    
+    \item \textbf{Classification}: The system uses a simple nearest neighbor classifier in the reduced space to predict digits.
+\end{itemize}
+
+The core algorithm workflow is:
+
+\begin{enumerate}
+    \item Center the data by subtracting the mean
+    \item Project the data to a lower-dimensional space using PCA
+    \item For prediction, project new images into the same space and find the nearest neighbor
+\end{enumerate}
+
+\subsubsection{Results Analysis}
+We conducted extensive testing using 10,000 training images and 1,000 test images from the MNIST dataset. The results for different numbers of principal components are shown in Table \ref{table:mnist_accuracy}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        \rowcolor{bluePoli!40}
+        \textbf{Number of Components} & \textbf{Accuracy} \T\B \\
+        \hline
+        2 & 37.9\% \T\B \\
+        4 & 58.1\% \T\B \\
+        8 & 85.1\% \T\B \\
+        16 & 92.3\% \T\B \\
+        32 & 93.7\% \T\B \\
+        64 & 93.3\% \T\B \\
+        128 & 93.1\% \T\B \\
+        256 & 92.7\% \B \\
+        \hline
+    \end{tabular}
+    \caption{Recognition accuracy with different numbers of principal components}
+    \label{table:mnist_accuracy}
+\end{table}
+
+Key observations from the results:
+
+\begin{itemize}
+    \item \textbf{Rapid Improvement}: The accuracy improves dramatically from 37.9\% with 2 components to 85.1\% with just 8 components, showing that even a small number of carefully chosen components can capture significant discriminative information.
+    
+    \item \textbf{Optimal Range}: The accuracy peaks at 93.7\% with 32 components, suggesting this is the optimal trade-off between dimensionality reduction and information preservation for this task.
+    
+    \item \textbf{Diminishing Returns}: Beyond 32 components, the accuracy slightly decreases, indicating that additional components may be introducing noise rather than useful information.
+\end{itemize}
+
+We also tested the system on individual images, successfully recognizing test digits (e.g., correctly identifying a test image of the digit "6"). This demonstrates the practical applicability of our implementation for real-world digit recognition tasks.
+
+The results show that our RandomizedSVD-based approach can achieve high accuracy while significantly reducing the dimensionality of the input data (from 784 to just 32 dimensions in the optimal case). This reduction leads to faster computation and lower memory requirements while maintaining excellent recognition performance.
 
 \subsection{Principal Component Analysis (PCA)}
 \subsubsection{Code Explanation}
