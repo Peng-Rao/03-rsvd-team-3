@@ -33,8 +33,8 @@ namespace Eigen{
         MatrixXd reducedMat;
         void dataReduced(const MatrixXd &data, int dimension) {
             // Step 1: data centralisation
-            Eigen::VectorXd mean = data.colwise().mean(); // 每列的均值
-            Eigen::MatrixXd centered = data.rowwise() - mean.transpose(); // 每行减去均值
+            Eigen::VectorXd mean = data.colwise().mean(); // get mean value of each column
+            Eigen::MatrixXd centered = data.rowwise() - mean.transpose(); // each row detract mean
 
             // Step 2: Compute the eigen vector by SVD
             Eigen::JacobiSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU | Eigen::ComputeThinV);

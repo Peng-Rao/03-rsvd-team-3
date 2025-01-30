@@ -15,7 +15,8 @@ int main(){
             1.9, 2.2, 1.1,
             3.1, 3.0, 1.8;
     cout << "orginal data:\n" << data << endl;
-
+    Eigen::MatrixXd row = data.rowwise();
+    cout << data.rowwise() << endl;
     Eigen::PCA pca_by_rsvd;
     pca_by_rsvd.computeByRSVD(data,2, 3);
     // reduced data
