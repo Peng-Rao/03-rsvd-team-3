@@ -9,3 +9,8 @@ target_link_libraries(pmsvd_dense_profiling PRIVATE Eigen3::Eigen)
 target_link_libraries(pmsvd_dense_profiling PRIVATE OpenMP::OpenMP_CXX)
 target_compile_options(pmsvd_dense_profiling PRIVATE -O3 -march=native)
 #target_link_libraries(pmsvd_dense_profiling PRIVATE OpenBLAS::OpenBLAS)
+
+add_executable(cur_dense_profiling cur.cpp)
+target_link_libraries(cur_dense_profiling PRIVATE Eigen3::Eigen)
+target_link_libraries(cur_dense_profiling PRIVATE OpenMP::OpenMP_CXX)
+target_compile_options(cur_dense_profiling PRIVATE -O3 -march=native)
