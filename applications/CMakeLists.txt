@@ -1,2 +1,1 @@
 add_subdirectory(imagecompression)
-add_subdirectory(PCA)

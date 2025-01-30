@@ -3,7 +3,7 @@
 //
 #include <iostream>
 #include <ctime>
-#include "PCA.h"
+#include "../applications/PCA/PCA.h"
 using namespace std;
 
 
