@@ -9,10 +9,6 @@ target_link_libraries(GivensRotationQRTest PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(GivensRotationQRTest PRIVATE OpenMP::OpenMP_CXX MPI::MPI_CXX)
 
 
-target_include_directories(PCATest PRIVATE
-    ${CMAKE_SOURCE_DIR}/applications
-)
-
 # Add Digits Recognition test
 add_executable(DigitsRecognitionTest test_digits_recognition.cpp)
 target_link_libraries(DigitsRecognitionTest PRIVATE
@@ -31,6 +27,6 @@ target_compile_definitions(DigitsRecognitionTest PRIVATE
 )
 
 
-add_executable(PCA test_PCA.cpp)
+add_executable(PCA test_PCA.cpp ../applications/PCA/PCA.h)
 target_link_libraries(PCA PRIVATE Eigen3::Eigen MPI::MPI_CXX)
 target_compile_options(PCA PRIVATE -O3 -march=native)
