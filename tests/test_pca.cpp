@@ -1,7 +1,3 @@
-
-//
-// Created by 黄家励 on 2025/1/27.
-//
 #include <iostream>
 #include <ctime>
 #include "../applications/PCA/PCA.h"
