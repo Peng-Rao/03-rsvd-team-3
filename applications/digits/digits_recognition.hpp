@@ -1,7 +1,7 @@
 #pragma once
 #include <Eigen/Dense>
 #include <opencv2/opencv.hpp>
-#include "PCA.h"
+#include <PCA/PCA.h>
 #include <vector>
 #include <string>
 #include <utility>

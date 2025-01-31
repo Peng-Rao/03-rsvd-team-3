@@ -4,8 +4,7 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <filesystem>
-#include "RandomizedSVD.h"
-#include "PCA.h"
+#include <RandomizedSVD.h>
 #include "digits_recognition.hpp"
 
 namespace fs = std::filesystem;
@@ -91,9 +90,10 @@ void DigitsRecognition::train(const Eigen::MatrixXd& training_data, const std::v
     mean_ = training_data.colwise().mean();
     Eigen::MatrixXd centered = training_data.rowwise() - mean_;
     
-    // Use PCA function from PCA library
-    // The rank parameter is set to num_components_ since we only need that many components
-    Eigen::MatrixXd reduced = PCA(training_data, num_components_, num_components_);
+    // Use PCA class from PCA library
+    Eigen::PCA pca;
+    pca.computeByRSVD(training_data, num_components_, num_components_);
+    Eigen::MatrixXd reduced = pca.reducedMatrix();
     
     // Store the projection matrix for later use
     projection_matrix_ = (centered.transpose() * centered).ldlt().solve(centered.transpose() * reduced);
