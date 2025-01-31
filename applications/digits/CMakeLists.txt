@@ -11,4 +11,5 @@ target_link_libraries(digits_recognition_lib PUBLIC
 
 target_include_directories(digits_recognition_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/applications
+    ${CMAKE_SOURCE_DIR}/applications/PCA
 ) 
