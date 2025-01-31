@@ -4,11 +4,15 @@
     "eigen3",
     "mpi",
     "openblas",
-    "stb",
     {
       "name": "opencv4",
-      "features": ["dnn", "highgui"],
-      "default-features": false
-    }
+      "default-features": false,
+      "features": [
+        "dnn",
+        "highgui"
+      ]
+    },
+    "stb",
+    "gtest"
   ]
 }
