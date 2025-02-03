@@ -1,6 +1,3 @@
-#ifndef IMAGECOMPRESSIONG_H
-#define IMAGECOMPRESSIONG_H
-
 #include "RandomizedSVD.h"
 #include <Eigen/Dense>
 #include <iostream>
@@ -180,5 +177,3 @@ int main(int argc, char* argv[]) {
  return 0;
 
 }
-
-#endif
