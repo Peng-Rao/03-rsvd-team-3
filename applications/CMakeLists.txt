@@ -1,3 +1,0 @@
-add_subdirectory(PCA)
-add_subdirectory(digits)
-add_subdirectory(imagecompression)
